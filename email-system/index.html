@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج تسجيل جديد</title>
+    <!-- ربط ملف التنسيقات (style.css) -->
+    <link rel="stylesheet" href="style.css">
+    <!-- تحميل مكتبة EmailJS (الإصدار الرابع المدعوم) -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- تهيئة EmailJS بالمفتاح العام (استبدل YOUR_PUBLIC_KEY_HERE) -->
+    <script type="text/javascript">
+        (function() {
+            // ضع المفتاح العام الخاص بك من لوحة تحكم EmailJS (Account → Public Key)
+            emailjs.init("53P1UJTIZ28FtAFcU"); 
+        })();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>إنشاء حساب جديد</h2>
+        <!-- نموذج التسجيل -->
+        <form id="registration-form">
+            <div class="form-group">
+                <label for="name">الاسم:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <button type="submit">تسجيل</button>
+        </form>
+    </div>
+    <!-- ربط ملف JavaScript (script.js) -->
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
+
+

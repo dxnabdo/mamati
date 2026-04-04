@@ -1,0 +1,55 @@
+/* متغيرات الألوان */
+:root {
+  --color-primary: #FF4D8D;
+  --color-primary-dark: #E63E7B;
+  --color-primary-light: #FF8DB3;
+  
+  --color-economy: #9CA3AF;
+  --color-economy-dark: #6B7280;
+  
+  --color-premium: #FFD700;
+  --color-premium-dark: #FBBF24;
+  
+  --color-whatsapp: #25D366;
+  --color-location: #32CD32;
+  --color-ai: #6A5ACD;
+  
+  --color-sets-women: #8B5CF6;
+  --color-sets-kids: #F97316;
+  
+  --color-notification: #EF4444;
+  --color-background: #FAFAFA;
+  
+  --color-text-black: #111111;
+  --color-text-gray: #6B7280;
+  --color-text-light: #9CA3AF;
+  
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+
+  /* الخطوط */
+  --font-family-sans: 'Cairo', 'Tajawal', system-ui, -apple-system, sans-serif;
+
+  /* المسافات */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+
+  /* أحجام الأيقونات */
+  --icon-size-sm: 20px;
+  --icon-size-md: 24px;
+  --icon-size-lg: 28px;
+  --icon-size-xl: 32px;
+
+  /* مدة الأنيميشن */
+  --animation-duration-shake: 0.3s;
+  --animation-duration-pulse: 0.5s;
+  --animation-duration-modal: 0.25s;
+  --animation-duration-toast: 0.2s;
+  --animation-duration-slide: 0.3s;
+}

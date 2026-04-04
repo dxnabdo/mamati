@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "حذاء أطفال أزرق",
+    "category": "أحذية",
+    "age": 3,
+    "size": 24,
+    "price": 70,
+    "brand": "Nike",
+    "color": "أزرق",
+    "image": "https://link-to-image.com/shoe1.jpg",
+    "url": "/product/1"
+  },
+  {
+    "id": 2,
+    "name": "شنطة مدرسية وردية",
+    "category": "شنط",
+    "age": 5,
+    "size": null,
+    "price": 120,
+    "brand": "Adidas",
+    "color": "وردي",
+    "image": "https://link-to-image.com/bag1.jpg",
+    "url": "/product/2"
+  },
+  {
+    "id": 3,
+    "name": "فستان أطفال أحمر",
+    "category": "ملابس أطفال",
+    "age": 4,
+    "size": null,
+    "price": 90,
+    "brand": "Zara",
+    "color": "أحمر",
+    "image": "https://link-to-image.com/dress1.jpg",
+    "url": "/product/3"
+  }
+]

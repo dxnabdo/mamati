@@ -1,0 +1,376 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== متغيرات مامتي ===== */
+:root {
+  --mamaty-orange: #FF8A5C;
+  --mamaty-orange-dark: #E67A4F;
+  --mamaty-orange-light: #FFB396;
+  
+  --mamaty-yellow: #FFD93D;
+  --mamaty-yellow-dark: #E6C337;
+  --mamaty-yellow-light: #FFE68C;
+  
+  --mamaty-green: #A8E6CF;
+  --mamaty-green-dark: #95CFB9;
+  --mamaty-green-light: #C2F0E0;
+  
+  --mamaty-blue: #6BC5D2;
+  --mamaty-blue-dark: #5FB1BD;
+  --mamaty-blue-light: #9BDAE3;
+  
+  --mamaty-purple: #D4B5D0;
+  --mamaty-purple-dark: #BFA3BB;
+  --mamaty-purple-light: #E4CDE1;
+  
+  --mamaty-background: #FFF9F5;
+  --mamaty-text: #4A4A4A;
+  --mamaty-text-light: #7A7A7A;
+}
+
+/* ===== القواعد الأساسية ===== */
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    background-color: var(--mamaty-background);
+    color: var(--mamaty-text);
+    font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    width: 100%;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--mamaty-background) 0%, #FFFFFF 100%);
+  }
+}
+
+/* ===== إخفاء شريط التمرير ===== */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ===== تنسيقات مامتي المخصصة ===== */
+@layer components {
+  /* شريط الأخبار */
+  .mamaty-news-bar {
+    @apply bg-gradient-to-r from-[#FF8A5C] to-[#FFD93D] text-white h-9 flex items-center overflow-hidden sticky top-0 z-50;
+  }
+
+  /* بطاقة العرض */
+  .mamaty-offer-card {
+    @apply flex-shrink-0 w-64 p-4 rounded-2xl shadow-md text-white;
+    background: linear-gradient(135deg, var(--mamaty-orange), var(--mamaty-yellow));
+  }
+
+  /* كارد المنتج */
+  .mamaty-product-card {
+    @apply bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm border border-[#FF8A5C]/10;
+    transition: all 0.3s ease;
+  }
+
+  .mamaty-product-card:hover {
+    @apply shadow-lg border-[#FF8A5C]/30 transform -translate-y-1;
+  }
+
+  /* شريط الفئات */
+  .mamaty-category-scroll {
+    @apply bg-gradient-to-b from-white to-[#FFF9F5] py-6 px-2;
+  }
+
+  /* منصة الفئة */
+  .mamaty-category-platform {
+    @apply flex flex-col items-center px-4 py-3 min-w-[120px] rounded-2xl border-2 transition-all duration-300;
+    background: linear-gradient(135deg, #FFF9F5, #FFFFFF);
+  }
+
+  /* أفاتار مع ظل */
+  .mamaty-avatar {
+    filter: drop-shadow(0 8px 6px rgba(255, 138, 92, 0.2));
+    transition: filter 0.3s ease;
+  }
+
+  .mamaty-avatar:hover {
+    filter: drop-shadow(0 12px 8px rgba(255, 138, 92, 0.3));
+  }
+
+  /* زر رئيسي */
+  .mamaty-btn-primary {
+    @apply bg-gradient-to-r from-[#FF8A5C] to-[#FFD93D] text-white font-bold py-3 px-6 rounded-xl shadow-md;
+    transition: all 0.3s ease;
+  }
+
+  .mamaty-btn-primary:hover {
+    @apply shadow-lg transform scale-105;
+  }
+
+  /* زر ثانوي */
+  .mamaty-btn-secondary {
+    @apply bg-white text-[#FF8A5C] border-2 border-[#FF8A5C] font-bold py-3 px-6 rounded-xl;
+    transition: all 0.3s ease;
+  }
+
+  .mamaty-btn-secondary:hover {
+    @apply bg-[#FF8A5C] text-white;
+  }
+
+  /* بادج السعر */
+  .mamaty-price-badge {
+    @apply absolute bottom-2 right-2 bg-gradient-to-r from-[#FF8A5C] to-[#FFD93D] text-white font-bold text-sm px-3 py-1.5 rounded-full shadow-md;
+  }
+
+  /* بادج الفئة */
+  .mamaty-category-badge {
+    @apply absolute top-2 left-2 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1 shadow-md;
+  }
+
+  /* بادج ممتاز */
+  .mamaty-badge-premium {
+    @apply bg-gradient-to-r from-[#FF8A5C] to-[#FFD93D];
+  }
+
+  /* بادج اقتصادي */
+  .mamaty-badge-economy {
+    @apply bg-gradient-to-r from-[#A8E6CF] to-[#6BC5D2];
+  }
+
+  /* بادج أطقم */
+  .mamaty-badge-sets {
+    @apply bg-gradient-to-r from-[#D4B5D0] to-[#FF8A5C];
+  }
+
+  /* شريط سفلي */
+  .mamaty-bottom-bar {
+    @apply fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[#FF8A5C]/20 py-2 px-4 z-50 shadow-lg;
+  }
+
+  /* سلة بارزة */
+  .mamaty-cart-floating {
+    @apply w-14 h-14 bg-gradient-to-r from-[#FF8A5C] to-[#FFD93D] rounded-full flex items-center justify-center shadow-lg border-4 border-white relative -mt-8;
+  }
+
+  /* نص العنوان */
+  .mamaty-section-title {
+    @apply text-lg font-bold mb-4 text-right px-2 text-gray-800;
+  }
+
+  .mamaty-section-title span {
+    @apply border-r-4 border-[#FF8A5C] pr-3;
+  }
+
+  /* شاشة التحميل */
+  .mamaty-loading {
+    @apply min-h-screen bg-gradient-to-br from-[#FFF9F5] to-white flex items-center justify-center;
+  }
+
+  .mamaty-loading-spinner {
+    @apply relative w-24 h-24 mx-auto mb-6;
+  }
+
+  .mamaty-loading-spinner div {
+    @apply absolute inset-0 border-4 border-[#FF8A5C]/20 rounded-full;
+  }
+
+  .mamaty-loading-spinner div:last-child {
+    @apply border-4 border-[#FF8A5C] rounded-full border-t-transparent animate-spin;
+  }
+
+  /* Toast رسائل */
+  .mamaty-toast {
+    @apply fixed bottom-20 left-1/2 transform -translate-x-1/2 text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg z-50;
+  }
+
+  .mamaty-toast-success {
+    background: linear-gradient(135deg, var(--mamaty-green), var(--mamaty-blue));
+  }
+
+  .mamaty-toast-error {
+    background: linear-gradient(135deg, #FF6B6B, #FF8A5C);
+  }
+
+  .mamaty-toast-info {
+    background: linear-gradient(135deg, var(--mamaty-blue), var(--mamaty-purple));
+  }
+}
+
+/* ===== الحركات والأنيميشن ===== */
+@layer utilities {
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-mamaty {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .animate-pulse-mamaty {
+    animation: pulse-mamaty 2s ease-in-out infinite;
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-slide-in-left {
+    animation: slideInLeft 0.3s ease-out;
+  }
+
+  @keyframes bounce-mamaty {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .animate-bounce-mamaty {
+    animation: bounce-mamaty 0.5s ease-in-out;
+  }
+}
+
+/* ===== تنسيقات الأفاتارات ===== */
+.avatar-shadow {
+  filter: drop-shadow(0 8px 6px rgba(255, 138, 92, 0.15));
+}
+
+.avatar-platform-shadow {
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* ===== تدرجات مامتي ===== */
+.mamaty-gradient-primary {
+  background: linear-gradient(135deg, var(--mamaty-orange), var(--mamaty-yellow));
+}
+
+.mamaty-gradient-secondary {
+  background: linear-gradient(135deg, var(--mamaty-green), var(--mamaty-blue));
+}
+
+.mamaty-gradient-tertiary {
+  background: linear-gradient(135deg, var(--mamaty-purple), var(--mamaty-orange));
+}
+
+/* ===== كروت شفافة ===== */
+.mamaty-glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 138, 92, 0.2);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px -5px rgba(255, 138, 92, 0.1);
+}
+
+/* ===== تنسيقات خاصة بالهاتف ===== */
+@media (max-width: 640px) {
+  .mamaty-category-platform {
+    min-width: 100px;
+    padding: 12px 8px;
+  }
+
+  .mamaty-offer-card {
+    width: 200px;
+    padding: 12px;
+  }
+}
+
+/* ===== تنسيقات للأجهزة اللمسية ===== */
+@media (hover: none) and (pointer: coarse) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .mamaty-btn-primary, .mamaty-btn-secondary {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+}
+
+/* ===== تنسيقات للشاشات الكبيرة ===== */
+@media (min-width: 768px) {
+  .container {
+    max-width: 428px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* ===== تنسيقات السلة الفارغة ===== */
+.empty-cart {
+  @apply flex flex-col items-center justify-center min-h-[60vh];
+}
+
+.empty-cart-icon {
+  @apply text-8xl mb-4 opacity-30;
+}
+
+/* ===== تنسيقات العداد ===== */
+.cart-badge {
+  @apply absolute -top-2 -right-2 bg-[#FF8A5C] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center;
+  animation: pulse 0.5s;
+}
+
+/* ===== تنسيقات شريط التقدم ===== */
+.progress-bar {
+  @apply h-1 bg-gray-200 rounded-full overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-[#FF8A5C] transition-all duration-300;
+}
+
+/* ===== تأثيرات إضافية ===== */
+.hover-lift {
+  transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 15px rgba(255, 138, 92, 0.3);
+}
