@@ -1,4 +1,4 @@
-// pages/index.jsx
+// pages/index.jsx (بعد التعديل - إزالة VoiceInput المنفصل)
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
@@ -188,6 +188,7 @@ export default function Home() {
         onFilterToggle={handleFilterToggle}
       />
 
+      {/* سلايدر البانر - بدون VoiceInput منفصل */}
       <div className="px-4 pt-0 pb-0">
         <Swiper
           modules={[Autoplay, Pagination]}
@@ -213,23 +214,6 @@ export default function Home() {
             </SwiperSlide>
           ))}
         </Swiper>
-      </div>
-
-      {/* شريط التواصل الاجتماعي مع الروابط المحدثة */}
-      <div className="flex justify-center items-center gap-3 py-0 bg-white/50">
-        <a href="https://www.tiktok.com/@mamaty_bal_marrakech?_r=1&_t=ZS-95EfmGgNeCY" target="_blank" rel="noopener noreferrer">
-          <img src="/icons/tiktok.png" alt="تيك توك" className="w-5 h-5" />
-        </a>
-        <a href="https://www.instagram.com/mamaty__bal_marrakech?igsh=endqOHcwMmU1MGFq" target="_blank" rel="noopener noreferrer">
-          <img src="/icons/instagram.png" alt="انستغرام" className="w-5 h-5" />
-        </a>
-        <a href="https://www.facebook.com/share/1EGQ2yrJZs/" target="_blank" rel="noopener noreferrer">
-          <img src="/icons/facebook.png" alt="فيسبوك" className="w-5 h-5" />
-        </a>
-        <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
-          <img src="/icons/youtube.png" alt="يوتيوب" className="w-5 h-5" />
-        </a>
-        <span className="text-xs text-gray-500 font-bold relative -top-1.5">تابعنا على</span>
       </div>
 
       <CategoriesScroll 
