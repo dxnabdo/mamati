@@ -10,7 +10,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "vercel-build": "npm install --legacy-peer-deps && npm run build",
     "watch": "node scripts/watch-desktop.js",
     "watch:dev": "concurrently \"npm run dev\" \"npm run watch\"",
     "clean": "rm -rf .next node_modules",
@@ -41,10 +40,6 @@
   },
   "engines": {
     "node": "24.x"
-  },
-  "overrides": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
   },
   "keywords": [
     "ecommerce",
