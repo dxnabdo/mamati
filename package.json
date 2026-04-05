@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "vercel-build": "npm install --legacy-peer-deps && npm run build",
+    "vercel-build": "npm cache clean --force && rm -rf node_modules package-lock.json && npm install --legacy-peer-deps && npm run build",
     "watch": "node scripts/watch-desktop.js",
     "watch:dev": "concurrently \"npm run dev\" \"npm run watch\"",
     "clean": "rm -rf .next node_modules",
