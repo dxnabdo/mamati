@@ -19,8 +19,6 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
-    "@speechly/react-client": "^2.2.4",
-    "@speechly/react-ui": "^2.7.5",
     "firebase": "^12.10.0",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.577.0",
@@ -35,7 +33,10 @@
   },
   "overrides": {
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-speech-kit": {
+      "react": "18.2.0"
+    }
   },
   "devDependencies": {
     "autoprefixer": "^10.4.16",
