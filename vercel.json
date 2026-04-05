@@ -1,0 +1,9 @@
+{
+  "nodeVersion": "24.x",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ]
+}
