@@ -171,9 +171,9 @@ export default function Home() {
   }
 
   const bannerSlides = [
-    { image: '/banners/banner1.jpg', link: '/?category=mixed_sets', showButton: true },
-    { image: '/banners/banner2.jpg', link: '/mamati-market', showButton: true },
-    { image: '/banners/banner3.jpg', link: '/', showButton: false },
+    { image: '/banners/banner1.png', link: '/?category=mixed_sets', showButton: true },
+    { image: '/banners/banner2.png', link: '/mamati-market', showButton: true },
+    { image: '/banners/banner3.png', link: '/', showButton: false },
   ];
 
   const categoryDisplay = getCategoryDisplay(selectedCategory);
