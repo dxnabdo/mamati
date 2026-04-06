@@ -1,3 +1,4 @@
+// pages/cart.jsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
@@ -19,63 +20,63 @@ export default function CartPage() {
   const handleCheckout = () => {
     setIsCheckingOut(true);
     playSound('success');
-    
-    // إنشاء رسالة واتساب
     const message = createWhatsAppMessage(items, getTotalPrice());
-    
-    // فتح واتساب مع الرسالة
     window.open(`https://wa.me/212663319599?text=${message}`, '_blank');
-    
     setIsCheckingOut(false);
     showToast('order_sent', 'success');
   };
 
-  // وصف المنتج مع أيقونة الجنس وكلمة "سنوات"
+  // وصف المنتج مع أيقونة الجنس والتصنيف
   const getProductDescription = (item) => {
-    const genderIcon = { 
-      'boy': '👦', 
-      'girls': '👧', 
-      'sets': '🎁' 
-    };
-    const icon = genderIcon[item.faction] || '';
-    const genderText = { 
-      'boy': 'ولد', 
-      'girls': 'بنت', 
-      'sets': 'أطقم' 
-    };
-    const text = genderText[item.faction] || '';
-    
-    if (item.faction === 'boy' || item.faction === 'girls') {
-      return `${icon} ${text} ${item.size} سنوات`;
+    // معالجة منتجات مامتي ماركيت
+    if (item.isMamatiMarket) {
+      const typeMap = {
+        bag: 'حقيبة',
+        tshirt: 'تي شيرت',
+        pants: 'سروال',
+        shoes: 'حذاء',
+        dress: 'فستان',
+        jacket: 'جاكيت',
+        accessory: 'إكسسوار'
+      };
+      const typeArabic = typeMap[item.type] || item.type || 'منتج';
+      const sizeText = item.size ? ` ${item.size}` : '';
+      return `🛍️ ${typeArabic}${sizeText}`;
     }
-    return `${icon} ${text}`;
+
+    // المنتجات العادية
+    const genderIcon = { 'boy': '👦', 'girls': '👧', 'sets': '🎁' };
+    const icon = genderIcon[item.faction] || '';
+    const genderText = { 'boy': 'ولد', 'girls': 'بنت', 'sets': 'أطقم' };
+    const text = genderText[item.faction] || '';
+
+    // تحديد التصنيف
+    let category = '';
+    if (item.faction === 'sets') {
+      category = 'أطقم';
+    } else if (item.price >= 25 && item.price <= 40) {
+      category = 'اقتصادي';
+    } else if (item.price >= 45 && item.price <= 60) {
+      category = 'ممتاز';
+    } else {
+      category = 'عادي'; // عرض "عادي" بدلاً من عدم ظهور شيء
+    }
+
+    if (item.faction === 'boy' || item.faction === 'girls') {
+      return `${icon} ${text} ${item.size} سنوات (${category})`;
+    }
+    return `${icon} ${text} (${category})`;
   };
 
-  // الحصول على الحرف الأول من الفئة (للسيريال)
-  const getFactionLetter = (faction) => {
-    const map = {
-      'boy': 'b',
-      'girls': 'g',
-      'sets': 's'
-    };
-    return map[faction] || '';
-  };
-
-  // إنشاء رسالة واتساب
+  // إنشاء رسالة واتساب (بدون سيريال)
   const createWhatsAppMessage = (items, totalPrice) => {
     let productsList = '';
-    
     items.forEach((item, index) => {
       const description = getProductDescription(item);
-      const letter = getFactionLetter(item.faction);
-      const serialCode = `${letter}_${item.size}_${item.price}_${item.serial}`;
       const productUrl = `${window.location.origin}/product/${item.id}`;
-      
       productsList += `${index + 1}. ${description} - ${item.price} درهم\n`;
-      productsList += `   🔗 رابط المنتج: ${productUrl}\n`;
-      productsList += `   🏷️ السيريال: ${serialCode}\n\n`;
+      productsList += `   🔗 رابط المنتج: ${productUrl}\n\n`;
     });
-
     return encodeURIComponent(
       `🛍️ *أريد طلب المنتجات التالية:*\n\n` +
       `${productsList}` +
@@ -137,20 +138,20 @@ export default function CartPage() {
                   src={item.image}
                   alt={item.name}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = '/icons/image-placeholder.png';
+                  }}
                 />
               </div>
 
               {/* تفاصيل المنتج */}
               <div className="flex-1 pr-3">
                 <div className="flex justify-between items-start">
-                  {/* العنوان في الوسط */}
                   <div className="flex-1 text-center">
                     <h3 className="font-bold text-base text-gray-800">
                       {getProductDescription(item)}
                     </h3>
                   </div>
-                  
-                  {/* زر الحذف مع كلمة "حذف" */}
                   <button
                     onClick={() => handleRemoveItem(item.id)}
                     className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600 hover:bg-red-50 hover:text-red-500 transition-colors"
@@ -160,7 +161,6 @@ export default function CartPage() {
                   </button>
                 </div>
 
-                {/* السعر - رقم على اليسار، "درهم" على اليمين */}
                 <div className="flex justify-center items-center gap-1 mt-2">
                   <span className="text-lg font-bold text-[#2A7DE1]">{item.price}</span>
                   <span className="text-sm text-gray-500">درهم</span>
@@ -174,7 +174,6 @@ export default function CartPage() {
       {/* الجزء السفلي الثابت */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
         <div className="max-w-md mx-auto">
-          {/* المجموع الكلي - كلمة في اليسار، السعر في اليمين */}
           <div className="flex justify-between items-center mb-4 px-2">
             <span className="text-2xl font-bold text-[#2A7DE1]">
               {getTotalPrice()} <span className="text-sm text-gray-500">درهم</span>
@@ -182,7 +181,6 @@ export default function CartPage() {
             <span className="text-gray-600 font-medium">المجموع الكلي</span>
           </div>
 
-          {/* زر اطلب الآن عبر واتساب */}
           <button
             onClick={handleCheckout}
             disabled={isCheckingOut}
@@ -201,7 +199,6 @@ export default function CartPage() {
             )}
           </button>
 
-          {/* رابط العودة للتسوق */}
           <div className="text-center mt-3">
             <button
               onClick={() => router.push('/')}
