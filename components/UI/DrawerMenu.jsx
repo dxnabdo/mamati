@@ -14,7 +14,7 @@ const DrawerMenu = ({ isOpen, onClose, onSearch }) => {
     } else {
       router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
     }
-    onClose(); // إغلاق القائمة بعد البحث (اختياري)
+    onClose();
   };
 
   const handleKeyPress = (e) => {
@@ -46,7 +46,7 @@ const DrawerMenu = ({ isOpen, onClose, onSearch }) => {
               <button onClick={onClose} className="text-2xl">✕</button>
             </div>
 
-            {/* 🔍 حقل البحث مع زر صغير (جديد) */}
+            {/* حقل البحث مع زر صغير */}
             <div className="flex gap-2 mb-6">
               <input
                 type="text"
@@ -64,28 +64,55 @@ const DrawerMenu = ({ isOpen, onClose, onSearch }) => {
               </button>
             </div>
 
-            {/* ✅ باقي محتوى القائمة (تسجيل الدخول، الحساب، الأيقونات، إلخ) */}
-            {/* ضع هنا الروابط والأيقونات التي كانت موجودة سابقاً */}
+            {/* روابط القائمة مع أيقونات */}
             <nav className="flex flex-col gap-3">
-              {/* مثال على الروابط الأساسية – أضف ما يناسب مشروعك */}
-              <Link href="/" onClick={onClose} className="hover:text-[#FF8A5C]">الرئيسية</Link>
-              <Link href="/favorites" onClick={onClose} className="hover:text-[#FF8A5C]">المفضلة</Link>
-              <Link href="/cart" onClick={onClose} className="hover:text-[#FF8A5C]">السلة</Link>
-              <Link href="/mamati-market" onClick={onClose} className="hover:text-[#FF8A5C]">مامتي ماركيت</Link>
-              
-              {/* روابط الحساب وتسجيل الدخول – تأكد من وجودها */}
-              <Link href="/login" onClick={onClose} className="hover:text-[#FF8A5C]">تسجيل الدخول</Link>
-              <Link href="/register" onClick={onClose} className="hover:text-[#FF8A5C]">إنشاء حساب</Link>
-              <Link href="/profile" onClick={onClose} className="hover:text-[#FF8A5C]">حسابي</Link>
-              
-              {/* روابط إضافية */}
-              <Link href="/instructions" onClick={onClose} className="hover:text-[#FF8A5C]">الإرشادات</Link>
-              <Link href="/delivery" onClick={onClose} className="hover:text-[#FF8A5C]">سياسة التوصيل</Link>
-              <Link href="/exchange" onClick={onClose} className="hover:text-[#FF8A5C]">الاستبدال</Link>
-              <Link href="/contact" onClick={onClose} className="hover:text-[#FF8A5C]">تواصل معنا</Link>
+              <Link href="/" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/home.png" alt="الرئيسية" className="w-5 h-5" />
+                <span>الرئيسية</span>
+              </Link>
+              <Link href="/favorites" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/heart.png" alt="المفضلة" className="w-5 h-5" />
+                <span>المفضلة</span>
+              </Link>
+              <Link href="/cart" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/cart.png" alt="السلة" className="w-5 h-5" />
+                <span>السلة</span>
+              </Link>
+              <Link href="/mamati-market" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/mamati.png" alt="مامتي ماركيت" className="w-5 h-5" />
+                <span>مامتي ماركيت</span>
+              </Link>
+              <Link href="/instructions" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/info.png" alt="الإرشادات" className="w-5 h-5" />
+                <span>الإرشادات</span>
+              </Link>
+              <Link href="/delivery" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/delivery.png" alt="التوصيل" className="w-5 h-5" />
+                <span>سياسة التوصيل</span>
+              </Link>
+              <Link href="/exchange" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/exchange.png" alt="الاستبدال" className="w-5 h-5" />
+                <span>الاستبدال</span>
+              </Link>
+              <Link href="/contact" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/contact.png" alt="تواصل معنا" className="w-5 h-5" />
+                <span>تواصل معنا</span>
+              </Link>
+              <Link href="/login" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/login.png" alt="تسجيل الدخول" className="w-5 h-5" />
+                <span>تسجيل الدخول</span>
+              </Link>
+              <Link href="/register" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/register.png" alt="إنشاء حساب" className="w-5 h-5" />
+                <span>إنشاء حساب</span>
+              </Link>
+              <Link href="/profile" onClick={onClose} className="flex items-center gap-2 hover:text-[#FF8A5C]">
+                <img src="/icons/user.png" alt="حسابي" className="w-5 h-5" />
+                <span>حسابي</span>
+              </Link>
             </nav>
 
-            {/* أيقونات التواصل الاجتماعي (إذا كانت موجودة) */}
+            {/* أيقونات التواصل الاجتماعي */}
             <div className="flex justify-center gap-4 mt-6 pt-4 border-t border-gray-200">
               <a href="https://www.instagram.com/mamaty__bal_marrakech" target="_blank" rel="noopener noreferrer">
                 <img src="/icons/instagram.png" alt="انستغرام" className="w-5 h-5" />
