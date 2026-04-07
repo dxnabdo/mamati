@@ -1,28 +1,32 @@
 // components/FilterModal.jsx
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const FilterModal = ({ isOpen, onClose, onApply }) => {
-  const [gender, setGender] = useState('');
+const FilterModal = ({ isOpen, onClose }) => {
+  const router = useRouter();
   const [age, setAge] = useState('');
   const [category, setCategory] = useState('');
 
-  // خيارات العمر من 6 أشهر إلى 12 سنة
   const ageOptions = [
-    '6 أشهر', '9 أشهر', '1 سنة', '1.5 سنة',
+    '6 أشهر', '9 أشهر',
+    '1 سنة', '1.5 سنة',
     '2-3 سنوات', '4-5 سنوات', '6-7 سنوات', '8-9 سنوات', '10-12 سنوات'
   ];
 
   const handleApply = () => {
-    const filters = { gender, age, category };
-    onApply(filters);
+    const params = new URLSearchParams();
+    if (age) params.append('age', age);
+    if (category) params.append('category', category);
+    router.push(`/?${params.toString()}`);
     onClose();
   };
 
   const handleReset = () => {
-    setGender('');
     setAge('');
     setCategory('');
+    router.push('/'); // إزالة الفلتر
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -43,45 +47,30 @@ const FilterModal = ({ isOpen, onClose, onApply }) => {
           className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl"
           onClick={(e) => e.stopPropagation()}
         >
-          <h2 className="text-2xl font-bold text-center text-[#FF8A5C] mb-4">فلتر المنتجات</h2>
+          <h2 className="text-2xl font-bold text-center text-[#FF8A5C] mb-4">فرز المنتجات</h2>
 
-          {/* الجنس */}
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold mb-2">الجنس</label>
-            <div className="flex gap-3">
-              {['boy', 'girl'].map((g) => (
+          {/* العمر */}
+          <div className="mb-6">
+            <label className="block text-gray-700 font-semibold mb-2">العمر</label>
+            <div className="grid grid-cols-2 gap-3">
+              {ageOptions.map((opt) => (
                 <button
-                  key={g}
-                  onClick={() => setGender(g)}
-                  className={`flex-1 py-2 rounded-full border-2 transition ${
-                    gender === g ? 'bg-[#FF8A5C] border-[#FF8A5C] text-white' : 'border-gray-300 text-gray-700'
+                  key={opt}
+                  onClick={() => setAge(opt)}
+                  className={`py-2 rounded-full border-2 transition ${
+                    age === opt ? 'bg-[#FF8A5C] border-[#FF8A5C] text-white' : 'border-gray-300 text-gray-700'
                   }`}
                 >
-                  {g === 'boy' ? '👦 أولاد' : '👧 بنات'}
+                  {opt}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* العمر */}
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold mb-2">العمر</label>
-            <select
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8A5C]"
-            >
-              <option value="">الكل</option>
-              {ageOptions.map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </div>
-
           {/* الفئة */}
           <div className="mb-6">
             <label className="block text-gray-700 font-semibold mb-2">الفئة</label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {['أطقم', 'أولاد', 'بنات'].map((cat) => (
                 <button
                   key={cat}
@@ -96,7 +85,6 @@ const FilterModal = ({ isOpen, onClose, onApply }) => {
             </div>
           </div>
 
-          {/* الأزرار */}
           <div className="flex gap-3">
             <button
               onClick={handleApply}

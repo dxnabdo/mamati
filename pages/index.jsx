@@ -44,6 +44,7 @@ export default function Home() {
   const { getItemCount } = useCartStore();
   const { items: favoriteItems } = useFavoritesStore();
 
+  // Handle category from query param (banner click)
   useEffect(() => {
     const { category } = router.query;
     if (category === 'mixed_sets') {
@@ -51,6 +52,7 @@ export default function Home() {
     }
   }, [router.query]);
 
+  // Load all products
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -71,37 +73,67 @@ export default function Home() {
     loadProducts();
   }, []);
 
+  // Filter by selectedCategory (from CategoriesScroll) and also by query parameters (age & category)
   useEffect(() => {
-    if (selectedCategory === null) {
-      setFilteredProducts(products);
-      return;
+    let filtered = [...products];
+
+    // First, filter by selectedCategory if any (from categories scroll)
+    if (selectedCategory !== null && selectedCategory !== 'mamati-market') {
+      switch (selectedCategory) {
+        case 'boys-economy':
+          filtered = filtered.filter(p => p.faction === 'boy' && p.price >= 25 && p.price <= 40);
+          break;
+        case 'boys-premium':
+          filtered = filtered.filter(p => p.faction === 'boy' && p.price >= 45 && p.price <= 60);
+          break;
+        case 'mixed_sets':
+          filtered = filtered.filter(p => p.faction === 'sets');
+          break;
+        case 'girls-economy':
+          filtered = filtered.filter(p => p.faction === 'girls' && p.price >= 25 && p.price <= 40);
+          break;
+        case 'girls-premium':
+          filtered = filtered.filter(p => p.faction === 'girls' && p.price >= 45 && p.price <= 60);
+          break;
+        default:
+          filtered = [...products];
+      }
+    } else if (selectedCategory === 'mamati-market') {
+      filtered = mamatiProducts;
     }
 
-    let filtered = [];
-    switch (selectedCategory) {
-      case 'boys-economy':
-        filtered = products.filter(p => p.faction === 'boy' && p.price >= 25 && p.price <= 40);
-        break;
-      case 'boys-premium':
-        filtered = products.filter(p => p.faction === 'boy' && p.price >= 45 && p.price <= 60);
-        break;
-      case 'mixed_sets':
-        filtered = products.filter(p => p.faction === 'sets');
-        break;
-      case 'girls-economy':
-        filtered = products.filter(p => p.faction === 'girls' && p.price >= 25 && p.price <= 40);
-        break;
-      case 'girls-premium':
-        filtered = products.filter(p => p.faction === 'girls' && p.price >= 45 && p.price <= 60);
-        break;
-      case 'mamati-market':
-        filtered = mamatiProducts;
-        break;
-      default:
-        filtered = products;
+    // Apply filter from URL query parameters (age and category)
+    const { age: ageParam, category: filterCategoryParam } = router.query;
+    if (filterCategoryParam) {
+      if (filterCategoryParam === 'أولاد') {
+        filtered = filtered.filter(p => p.faction === 'boy');
+      } else if (filterCategoryParam === 'بنات') {
+        filtered = filtered.filter(p => p.faction === 'girls');
+      } else if (filterCategoryParam === 'أطقم') {
+        filtered = filtered.filter(p => p.faction === 'sets');
+      }
     }
+    if (ageParam) {
+      filtered = filtered.filter(p => {
+        const productAge = Number(p.size); // age from filename (size field)
+        if (isNaN(productAge)) return false;
+        switch (ageParam) {
+          case '6 أشهر': return productAge === 0.5;
+          case '9 أشهر': return productAge === 0.75;
+          case '1 سنة': return productAge === 1;
+          case '1.5 سنة': return productAge === 1.5;
+          case '2-3 سنوات': return productAge >= 2 && productAge <= 3;
+          case '4-5 سنوات': return productAge >= 4 && productAge <= 5;
+          case '6-7 سنوات': return productAge >= 6 && productAge <= 7;
+          case '8-9 سنوات': return productAge >= 8 && productAge <= 9;
+          case '10-12 سنوات': return productAge >= 10 && productAge <= 12;
+          default: return true;
+        }
+      });
+    }
+
     setFilteredProducts(filtered);
-  }, [selectedCategory, products, mamatiProducts]);
+  }, [selectedCategory, products, mamatiProducts, router.query]);
 
   const getCategoryDisplay = (categoryId) => {
     if (categoryId === null) return { text: 'جميع المنتجات', icon: '/icons/star.png' };
@@ -116,14 +148,18 @@ export default function Home() {
     return categoryMap[categoryId] || { text: 'منتجات', icon: '/icons/star.png' };
   };
 
-  // البحث فقط حسب الفئة (أولاد، بنات، أطقم) بدون جنس
+  // Search only by category name (أولاد، بنات، أطقم)
   const handleSearch = (query) => {
     if (!query || query.trim() === '') {
-      setFilteredProducts(products);
+      // Reset to current filtered products based on selected category and query params
+      // We rely on useEffect to recalc, but for immediate we can just refilter
+      const params = new URLSearchParams(router.query);
+      if (params.has('search')) params.delete('search');
+      router.push({ pathname: '/', query: params.toString() });
       return;
     }
     const searchLower = query.toLowerCase().trim();
-    const filtered = products.filter(p => {
+    const filteredBySearch = products.filter(p => {
       let categoryName = '';
       if (p.faction === 'boy') categoryName = 'أولاد';
       else if (p.faction === 'girls') categoryName = 'بنات';
@@ -131,7 +167,7 @@ export default function Home() {
       else categoryName = p.faction;
       return categoryName.includes(searchLower);
     });
-    setFilteredProducts(filtered);
+    setFilteredProducts(filteredBySearch);
   };
 
   const handleFilterToggle = () => setShowFilter(!showFilter);
@@ -193,7 +229,6 @@ export default function Home() {
         onFilterToggle={handleFilterToggle}
       />
 
-      {/* سلايدر البانر - بدون أي هوامس */}
       <div className="px-0 pt-0 pb-0">
         <Swiper
           modules={[Autoplay, Pagination]}
@@ -221,10 +256,8 @@ export default function Home() {
         </Swiper>
       </div>
 
-      {/* شريط السوشيال ميديا - رقيق جداً */}
       <SocialStrip />
 
-      {/* شريط الفئات - بدون هوامس علوية */}
       <CategoriesScroll 
         onCategorySelect={(catId) => setSelectedCategory(catId)} 
         products={products} 
