@@ -52,6 +52,14 @@ export default function Home() {
     }
   }, [router.query]);
 
+  // Handle search from query param (drawer menu search)
+  useEffect(() => {
+    const { search } = router.query;
+    if (search && typeof search === 'string') {
+      handleSearch(search);
+    }
+  }, [router.query]);
+
   // Load all products
   useEffect(() => {
     const loadProducts = async () => {
@@ -103,7 +111,7 @@ export default function Home() {
     }
 
     // Apply filter from URL query parameters (age and category)
-    const { age: ageParam, category: filterCategoryParam } = router.query;
+    const { age: ageParam, category: filterCategoryParam, search } = router.query;
     if (filterCategoryParam) {
       if (filterCategoryParam === 'أولاد') {
         filtered = filtered.filter(p => p.faction === 'boy');
@@ -143,6 +151,18 @@ export default function Home() {
         }
       });
     }
+    // Apply search filter if present (overrides other filters? we keep it last)
+    if (search && typeof search === 'string') {
+      const searchLower = search.toLowerCase().trim();
+      filtered = filtered.filter(p => {
+        let categoryName = '';
+        if (p.faction === 'boy') categoryName = 'أولاد';
+        else if (p.faction === 'girls') categoryName = 'بنات';
+        else if (p.faction === 'sets') categoryName = 'أطقم';
+        else categoryName = p.faction;
+        return categoryName.includes(searchLower);
+      });
+    }
 
     setFilteredProducts(filtered);
   }, [selectedCategory, products, mamatiProducts, router.query]);
@@ -164,20 +184,13 @@ export default function Home() {
   const handleSearch = (query) => {
     if (!query || query.trim() === '') {
       const params = new URLSearchParams(router.query);
-      if (params.has('search')) params.delete('search');
+      params.delete('search');
       router.push({ pathname: '/', query: params.toString() });
       return;
     }
     const searchLower = query.toLowerCase().trim();
-    const filteredBySearch = products.filter(p => {
-      let categoryName = '';
-      if (p.faction === 'boy') categoryName = 'أولاد';
-      else if (p.faction === 'girls') categoryName = 'بنات';
-      else if (p.faction === 'sets') categoryName = 'أطقم';
-      else categoryName = p.faction;
-      return categoryName.includes(searchLower);
-    });
-    setFilteredProducts(filteredBySearch);
+    // We'll set query param and let useEffect handle filtering
+    router.push(`/?search=${encodeURIComponent(searchLower)}`);
   };
 
   const handleFilterToggle = () => setShowFilter(!showFilter);
@@ -275,7 +288,7 @@ export default function Home() {
 
       <div className="px-4 pt-2 pb-28">
         {/* Mamati Market card - shown only when no filter is active and no category selected from scroll */}
-        {selectedCategory === null && !router.query.age && !router.query.category && mamatiProducts.length > 0 && (
+        {selectedCategory === null && !router.query.age && !router.query.category && !router.query.search && mamatiProducts.length > 0 && (
           <div className="mb-6 p-4 rounded-lg relative overflow-hidden" style={{ backgroundColor: '#F7F5F2' }}>
             <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute top-4 left-4 text-4xl">👛</div>
