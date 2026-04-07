@@ -22,13 +22,11 @@ export default function CartPage() {
     playSound('success');
     const message = createWhatsAppMessage(items, getTotalPrice());
     window.open(`https://wa.me/212663319599?text=${message}`, '_blank');
-    // تفريغ السلة بعد فتح واتساب
-    clearCart();
+    clearCart(); // تفريغ السلة بعد فتح واتساب
     setIsCheckingOut(false);
     showToast('order_sent', 'success');
   };
 
-  // وصف المنتج مع أيقونة الجنس والتصنيف
   const getProductDescription = (item) => {
     const priceNum = Number(item.price);
     if (item.isMamatiMarket) {
@@ -103,13 +101,9 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFF9F5] to-white pb-32">
-      {/* الهيدر */}
       <div className="bg-white sticky top-0 z-10 shadow-sm">
         <div className="flex items-center justify-between p-4">
-          <button
-            onClick={() => router.back()}
-            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
-          >
+          <button onClick={() => router.back()} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors">
             <img src="/icons/arrow-left.png" alt="رجوع" className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-bold text-gray-800">سلة المشتريات</h1>
@@ -119,37 +113,19 @@ export default function CartPage() {
         </div>
       </div>
 
-      {/* قائمة المنتجات */}
       <div className="p-4 space-y-4">
         {items.map((item) => (
-          <motion.div
-            key={item.id}
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-          >
+          <motion.div key={item.id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -50 }} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="flex p-3">
               <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => { e.target.src = '/icons/image-placeholder.png'; }}
-                />
+                <img src={item.image} alt={item.name} className="w-full h-full object-cover" onError={(e) => { e.target.src = '/icons/image-placeholder.png'; }} />
               </div>
               <div className="flex-1 pr-3">
                 <div className="flex justify-between items-start">
                   <div className="flex-1 text-center">
                     <h3 className="font-bold text-base text-gray-800">{getProductDescription(item)}</h3>
                   </div>
-                  {/* زر الحذف بأيقونة السلة (delete.png) */}
-                  <button
-                    onClick={() => handleRemoveItem(item.id)}
-                    className="p-2 bg-gray-100 rounded-full hover:bg-red-50 transition-colors"
-                    title="حذف المنتج"
-                  >
+                  <button onClick={() => handleRemoveItem(item.id)} className="p-2 bg-gray-100 rounded-full hover:bg-red-50 transition-colors" title="حذف المنتج">
                     <img src="/icons/delete.png" alt="حذف" className="w-5 h-5" />
                   </button>
                 </div>
@@ -163,20 +139,13 @@ export default function CartPage() {
         ))}
       </div>
 
-      {/* الجزء السفلي الثابت */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
         <div className="max-w-md mx-auto">
           <div className="flex justify-between items-center mb-4 px-2">
-            <span className="text-2xl font-bold text-[#2A7DE1]">
-              {getTotalPrice()} <span className="text-sm text-blue-600">درهم</span>
-            </span>
+            <span className="text-2xl font-bold text-[#2A7DE1]">{getTotalPrice()} <span className="text-sm text-blue-600">درهم</span></span>
             <span className="text-gray-600 font-medium">المجموع الكلي</span>
           </div>
-          <button
-            onClick={handleCheckout}
-            disabled={isCheckingOut}
-            className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-green-700 transition-colors shadow-md"
-          >
+          <button onClick={handleCheckout} disabled={isCheckingOut} className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-green-700 transition-colors shadow-md">
             {isCheckingOut ? (
               <><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span><span>جاري التجهيز...</span></>
             ) : (
@@ -184,12 +153,7 @@ export default function CartPage() {
             )}
           </button>
           <div className="text-center mt-3">
-            <button
-              onClick={() => router.push('/')}
-              className="text-[#2A7DE1] hover:underline text-sm font-medium"
-            >
-              ← العودة للتسوق
-            </button>
+            <button onClick={() => router.push('/')} className="text-[#2A7DE1] hover:underline text-sm font-medium">← العودة للتسوق</button>
           </div>
         </div>
       </div>

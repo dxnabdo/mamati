@@ -8,13 +8,12 @@ export default function PhoneRegisterPopup() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // التحقق مما إذا كانت النافذة ظهرت من قبل
     const hasShown = localStorage.getItem("popupShown");
     if (!hasShown) {
       const timer = setTimeout(() => {
         setShow(true);
         localStorage.setItem("popupShown", "true");
-      }, 5000); // 5 ثوانٍ
+      }, 6000); // 6 ثوانٍ
       return () => clearTimeout(timer);
     }
   }, []);
@@ -74,7 +73,7 @@ export default function PhoneRegisterPopup() {
           >
             {loading ? "جاري الإرسال..." : "أخبرني عند وصول الجديد"}
           </button>
-          <p className="mt-4 text-sm text-gray-500">🔥% أكثر من 1000 شخص مشترك — رقمك آمن 100</p>
+          <p className="mt-4 text-sm text-gray-500">🔥 %أكثر من 1000 شخص مشترك — رقمك آمن 100</p>
           {message && (
             <p className={`mt-3 p-2 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
               {message}

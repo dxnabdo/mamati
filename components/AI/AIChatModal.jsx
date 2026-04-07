@@ -10,43 +10,30 @@ const AIChatModal = ({ isOpen, onClose }) => {
   const messagesEndRef = useRef(null);
   const listeningTimeoutRef = useRef(null);
 
-  // إعدادات التعرف على الصوت
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
 
-  // تحديث حقل الإدخال بالنص المسموع
   useEffect(() => {
-    if (transcript) {
-      setInputValue(transcript);
-    }
+    if (transcript) setInputValue(transcript);
   }, [transcript]);
 
-  // إعادة ضبط المحادثة عند فتح المودال
   useEffect(() => {
     if (isOpen) {
       setMessages([]);
       setInputValue("");
       resetTranscript();
-      if (listening) {
-        SpeechRecognition.stopListening();
-      }
-      if (listeningTimeoutRef.current) {
-        clearTimeout(listeningTimeoutRef.current);
-      }
+      if (listening) SpeechRecognition.stopListening();
+      if (listeningTimeoutRef.current) clearTimeout(listeningTimeoutRef.current);
     }
   }, [isOpen, resetTranscript, listening]);
 
-  // التمرير التلقائي إلى آخر رسالة
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // إيقاف التسجيل تلقائياً بعد 5 ثوانٍ من بدايته
   const autoStopListening = () => {
     if (listeningTimeoutRef.current) clearTimeout(listeningTimeoutRef.current);
     listeningTimeoutRef.current = setTimeout(() => {
-      if (listening) {
-        SpeechRecognition.stopListening();
-      }
+      if (listening) SpeechRecognition.stopListening();
     }, 5000);
   };
 
@@ -65,40 +52,27 @@ const AIChatModal = ({ isOpen, onClose }) => {
   };
 
   const stopListening = () => {
-    if (listening) {
-      SpeechRecognition.stopListening();
-    }
-    if (listeningTimeoutRef.current) {
-      clearTimeout(listeningTimeoutRef.current);
-    }
+    if (listening) SpeechRecognition.stopListening();
+    if (listeningTimeoutRef.current) clearTimeout(listeningTimeoutRef.current);
   };
 
   const handleSendMessage = async () => {
     const text = inputValue.trim();
     if (!text || loading) return;
-
-    // إيقاف التسجيل الصوتي إذا كان نشطاً
     stopListening();
-
     const userMessage = { role: "user", content: text };
     setMessages(prev => [...prev, { sender: "user", text }]);
     setInputValue("");
     resetTranscript();
     setLoading(true);
-
     try {
-      const apiMessages = messages.map(m => ({
-        role: m.sender === "user" ? "user" : "assistant",
-        content: m.text
-      }));
+      const apiMessages = messages.map(m => ({ role: m.sender === "user" ? "user" : "assistant", content: m.text }));
       apiMessages.push(userMessage);
-
       const response = await fetch("/api/ai-tail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: apiMessages })
       });
-
       const data = await response.json();
       if (data.response) {
         setMessages(prev => [...prev, { sender: "ai", text: data.response }]);
@@ -139,13 +113,11 @@ const AIChatModal = ({ isOpen, onClose }) => {
           onClick={(e) => e.stopPropagation()}
           className="bg-white w-full sm:w-96 max-h-[90vh] rounded-t-2xl sm:rounded-2xl p-4 flex flex-col shadow-xl"
         >
-          {/* الرأس */}
           <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-200">
             <h2 className="text-lg font-bold">مساعد مامتي 🤖</h2>
             <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-xl leading-5">✕</button>
           </div>
 
-          {/* منطقة الرسائل */}
           <div className="flex-1 overflow-y-auto space-y-2 mb-2 min-h-[200px] max-h-[50vh]">
             {messages.length === 0 && (
               <div className="text-center text-gray-400 text-sm mt-4">
@@ -174,7 +146,6 @@ const AIChatModal = ({ isOpen, onClose }) => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* حقل الإدخال مع زر الميكروفون */}
           <div className="flex gap-2 border-t pt-2">
             <textarea
               rows={1}

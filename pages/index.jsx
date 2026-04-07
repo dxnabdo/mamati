@@ -189,7 +189,7 @@ export default function Home() {
         onFilterToggle={handleFilterToggle}
       />
 
-      {/* سلايدر البانر - بدون هوامس علوية/سفلية */}
+      {/* سلايدر البانر */}
       <div className="px-4 pt-0 pb-0">
         <Swiper
           modules={[Autoplay, Pagination]}
@@ -217,10 +217,10 @@ export default function Home() {
         </Swiper>
       </div>
 
-      {/* شريط السوشيال ميديا - بدون هوامس ولا خطوط */}
+      {/* شريط السوشيال ميديا */}
       <SocialStrip />
 
-      {/* شريط الفئات - بدون هوامس علوية */}
+      {/* شريط الفئات */}
       <CategoriesScroll 
         onCategorySelect={(catId) => setSelectedCategory(catId)} 
         products={products} 
