@@ -115,19 +115,31 @@ export default function Home() {
     }
     if (ageParam) {
       filtered = filtered.filter(p => {
-        const productAge = Number(p.size); // age from filename (size field)
+        const productAge = parseFloat(p.size); // support decimals (0.5, 1.5)
         if (isNaN(productAge)) return false;
         switch (ageParam) {
-          case '6 أشهر': return productAge === 0.5;
-          case '9 أشهر': return productAge === 0.75;
-          case '1 سنة': return productAge === 1;
-          case '1.5 سنة': return productAge === 1.5;
-          case '2-3 سنوات': return productAge >= 2 && productAge <= 3;
-          case '4-5 سنوات': return productAge >= 4 && productAge <= 5;
-          case '6-7 سنوات': return productAge >= 6 && productAge <= 7;
-          case '8-9 سنوات': return productAge >= 8 && productAge <= 9;
-          case '10-12 سنوات': return productAge >= 10 && productAge <= 12;
-          default: return true;
+          case '6-9 أشهر':
+            return productAge >= 0.5 && productAge <= 0.75;
+          case '1-1.5 سنة':
+            return productAge >= 1 && productAge <= 1.5;
+          case '2-3 سنة':
+            return productAge >= 2 && productAge <= 3;
+          case '3-4 سنة':
+            return productAge >= 3 && productAge <= 4;
+          case '4-5 سنة':
+            return productAge >= 4 && productAge <= 5;
+          case '5-6 سنة':
+            return productAge >= 5 && productAge <= 6;
+          case '6-7 سنة':
+            return productAge >= 6 && productAge <= 7;
+          case '7-8 سنة':
+            return productAge >= 7 && productAge <= 8;
+          case '8-9 سنة':
+            return productAge >= 8 && productAge <= 9;
+          case '10-12 سنة':
+            return productAge >= 10 && productAge <= 12;
+          default:
+            return true;
         }
       });
     }
@@ -151,8 +163,6 @@ export default function Home() {
   // Search only by category name (أولاد، بنات، أطقم)
   const handleSearch = (query) => {
     if (!query || query.trim() === '') {
-      // Reset to current filtered products based on selected category and query params
-      // We rely on useEffect to recalc, but for immediate we can just refilter
       const params = new URLSearchParams(router.query);
       if (params.has('search')) params.delete('search');
       router.push({ pathname: '/', query: params.toString() });
@@ -264,7 +274,8 @@ export default function Home() {
       />
 
       <div className="px-4 pt-2 pb-28">
-        {selectedCategory === null && mamatiProducts.length > 0 && (
+        {/* Mamati Market card - shown only when no filter is active and no category selected from scroll */}
+        {selectedCategory === null && !router.query.age && !router.query.category && mamatiProducts.length > 0 && (
           <div className="mb-6 p-4 rounded-lg relative overflow-hidden" style={{ backgroundColor: '#F7F5F2' }}>
             <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute top-4 left-4 text-4xl">👛</div>
