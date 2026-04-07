@@ -7,49 +7,33 @@ export default function AIChatModal({ isOpen, onClose }) {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
-  const [typingText, setTypingText] = useState("");
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
-  const listeningTimeoutRef = useRef(null);
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
 
-  // Load chat history
+  // Fix mic continuous issue
   useEffect(() => {
-    const saved = localStorage.getItem("ai-chat");
-    if (saved) setMessages(JSON.parse(saved));
-  }, []);
-
-  // Save chat history
-  useEffect(() => {
-    localStorage.setItem("ai-chat", JSON.stringify(messages));
-  }, [messages]);
-
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      if (listeningTimeoutRef.current) clearTimeout(listeningTimeoutRef.current);
-    };
-  }, []);
-
-  // Voice input
-  useEffect(() => {
-    if (transcript) setInputValue(transcript);
+    if (transcript) {
+      setInputValue(transcript);
+    }
   }, [transcript]);
 
-  // Reset when open
+  // Stop mic automatically after speaking
   useEffect(() => {
-    if (isOpen) {
-      resetTranscript();
-      if (listening) SpeechRecognition.stopListening();
+    if (listening) {
+      const timeout = setTimeout(() => {
+        SpeechRecognition.stopListening();
+      }, 3000);
+      return () => clearTimeout(timeout);
     }
-  }, [isOpen]);
+  }, [listening]);
 
   // Auto scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, typingText]);
+  }, [messages]);
 
   // Auto resize textarea
   useEffect(() => {
@@ -59,81 +43,44 @@ export default function AIChatModal({ isOpen, onClose }) {
     }
   }, [inputValue]);
 
-  const autoStopListening = () => {
-    if (listeningTimeoutRef.current) clearTimeout(listeningTimeoutRef.current);
-    listeningTimeoutRef.current = setTimeout(() => {
-      if (listening) SpeechRecognition.stopListening();
-    }, 5000);
-  };
-
   const startListening = () => {
     if (!browserSupportsSpeechRecognition) {
-      alert("المتصفح لا يدعم الإدخال الصوتي");
+      alert("المتصفح لا يدعم الميكروفون");
       return;
     }
 
     if (listening) {
       SpeechRecognition.stopListening();
-      clearTimeout(listeningTimeoutRef.current);
     } else {
-      SpeechRecognition.startListening({ language: "ar-MA" });
-      autoStopListening();
+      resetTranscript();
+      SpeechRecognition.startListening({ language: "ar-MA", continuous: false });
     }
-  };
-
-  const stopListening = () => {
-    if (listening) SpeechRecognition.stopListening();
-    if (listeningTimeoutRef.current) clearTimeout(listeningTimeoutRef.current);
-  };
-
-  const typeEffect = (text) => {
-    let i = 0;
-    setTypingText("");
-
-    const interval = setInterval(() => {
-      setTypingText((prev) => prev + text.charAt(i));
-      i++;
-      if (i >= text.length) clearInterval(interval);
-    }, 15);
   };
 
   const handleSendMessage = async () => {
     const text = inputValue.trim();
     if (!text || loading) return;
 
-    stopListening();
-
     const newMessages = [...messages, { sender: "user", text }];
     setMessages(newMessages);
     setInputValue("");
-    resetTranscript();
     setLoading(true);
 
     try {
-      const apiMessages = newMessages.map((m) => ({
-        role: m.sender === "user" ? "user" : "assistant",
-        content: m.text,
-      }));
-
       const res = await fetch("/api/ai-tail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: apiMessages }),
+        body: JSON.stringify({ messages: newMessages }),
       });
 
-      if (!res.ok) throw new Error("Server error");
-
       const data = await res.json();
-      const reply = data.response || "لم أتمكن من الرد";
 
-      typeEffect(reply);
-
-      setTimeout(() => {
-        setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
-        setTypingText("");
-      }, reply.length * 15);
-    } catch (err) {
-      setMessages((prev) => [...prev, { sender: "ai", text: "خطأ في الاتصال" }]);
+      setMessages((prev) => [
+        ...prev,
+        { sender: "ai", text: data.response || "لا يوجد رد" },
+      ]);
+    } catch {
+      setMessages((prev) => [...prev, { sender: "ai", text: "خطأ" }]);
     } finally {
       setLoading(false);
     }
@@ -162,58 +109,50 @@ export default function AIChatModal({ isOpen, onClose }) {
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
           onClick={(e) => e.stopPropagation()}
-          className="relative bg-white w-full sm:w-96 max-h-[90vh] rounded-t-2xl sm:rounded-2xl p-4 flex flex-col shadow-2xl overflow-hidden"
+          className="bg-white w-full sm:w-96 max-h-[90vh] rounded-t-2xl sm:rounded-2xl p-4 flex flex-col shadow-2xl"
         >
 
-          {/* 🔥 Background Logo */}
-          <img
-            src="/mamaty-logo.png"
-            className="absolute inset-0 w-full h-full object-contain opacity-10 pointer-events-none"
-            alt="logo"
-          />
-
-          {/* Header */}
-          <div className="relative flex items-center justify-between mb-2 pb-2 border-b">
+          {/* Header (clean & professional) */}
+          <div className="flex items-center justify-between mb-2 pb-2 border-b">
             <div className="flex items-center gap-2">
               <img src="/generative.png" className="w-6 h-6" />
-              <h2 className="font-bold text-gray-800">مساعد مامتي الذكي</h2>
+              <img src="/mamaty-logo.png" className="w-6 h-6" />
+              <h2 className="font-bold text-gray-800">مساعدك الذكي</h2>
             </div>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+            <button onClick={onClose}>✕</button>
           </div>
 
-          {/* Quote */}
-          <div className="relative text-xs text-gray-500 text-center mb-2 italic">
-            "المساعد الذكي هنا ليساعدك تختار الأفضل بسهولة ويحول زيارتك إلى تجربة تسوق ممتعة"
+          {/* Short professional text */}
+          <div className="text-xs text-gray-500 text-center mb-2">
+            تسوق ذكي بسرعة وسهولة
           </div>
 
           {/* Messages */}
-          <div className="relative flex-1 overflow-y-auto space-y-2 mb-2">
+          <div className="flex-1 overflow-y-auto space-y-2 mb-2">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`px-3 py-2 rounded-xl max-w-[80%] text-sm ${msg.sender === "user" ? "bg-orange-100 text-orange-800" : "bg-gray-100 text-gray-800"}`}>
+                <div className={`px-3 py-2 rounded-xl max-w-[80%] text-sm ${msg.sender === "user" ? "bg-orange-100" : "bg-gray-100"}`}>
                   {msg.text}
                 </div>
               </div>
             ))}
 
-            {typingText && (
-              <div className="bg-gray-200 p-2 rounded-xl text-sm">
-                {typingText}
-              </div>
+            {loading && (
+              <div className="text-sm text-gray-400">...</div>
             )}
 
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
-          <div className="relative flex gap-2 border-t pt-2">
+          <div className="flex gap-2 border-t pt-2">
             <textarea
               ref={textareaRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="اكتب رسالتك..."
-              className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none text-sm"
+              placeholder="اكتب..."
+              className="flex-1 border rounded-lg px-3 py-2 resize-none text-sm"
             />
 
             <button
@@ -226,9 +165,9 @@ export default function AIChatModal({ isOpen, onClose }) {
             <button
               onClick={handleSendMessage}
               disabled={loading}
-              className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-600"
+              className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm"
             >
-              {loading ? "..." : "إرسال"}
+              إرسال
             </button>
           </div>
         </motion.div>
