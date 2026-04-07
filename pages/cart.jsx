@@ -2,17 +2,17 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
-import useCartStore from '../../utils/cartStore';
-import { playSound } from '../../utils/soundEffects';
-import { showToast } from '../../utils/toastMessages';
+import useCartStore from '../utils/cartStore';        // ✅ مسار صحيح
+import { playSound } from '../utils/soundEffects';    // ✅ مسار صحيح
+import { showToast } from '../utils/toastMessages';   // ✅ مسار صحيح
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, removeItem, getTotalPrice, getItemCount } = useCartStore();
+  const { items, removeFromCart, getTotalPrice, getItemCount } = useCartStore(); // ✅ removeFromCart
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const handleRemoveItem = (productId) => {
-    removeItem(productId);
+    removeFromCart(productId);   // ✅ استدعاء الدالة الصحيحة
     playSound('remove');
     showToast('removed_from_cart', 'info');
   };
@@ -26,12 +26,9 @@ export default function CartPage() {
     showToast('order_sent', 'success');
   };
 
-  // دالة موحدة للحصول على وصف المنتج (بدون سيريال)
+  // دالة وصف المنتج (بدون سيريال)
   const getProductDescription = (item) => {
-    // التأكد من أن السعر رقم
     const priceNum = Number(item.price);
-    
-    // منتجات مامتي ماركيت
     if (item.isMamatiMarket) {
       const typeMap = {
         bag: 'حقيبة',
@@ -47,13 +44,11 @@ export default function CartPage() {
       return `🛍️ ${typeArabic}${sizeText}`;
     }
 
-    // المنتجات العادية
     const genderIcon = { 'boy': '👦', 'girls': '👧', 'sets': '🎁' };
     const icon = genderIcon[item.faction] || '';
     const genderText = { 'boy': 'ولد', 'girls': 'بنت', 'sets': 'أطقم' };
     const text = genderText[item.faction] || '';
 
-    // تحديد التصنيف بدقة
     let category = '';
     if (item.faction === 'sets') {
       category = 'أطقم';
@@ -62,7 +57,6 @@ export default function CartPage() {
     } else if (priceNum >= 45 && priceNum <= 60) {
       category = 'ممتاز';
     } else {
-      // إذا كان السعر خارج النطاق، نعرض "عادي"
       category = 'عادي';
     }
 
@@ -72,7 +66,6 @@ export default function CartPage() {
     return `${icon} ${text} (${category})`;
   };
 
-  // رسالة واتساب (بدون سيريال)
   const createWhatsAppMessage = (items, totalPrice) => {
     let productsList = '';
     items.forEach((item, index) => {
@@ -95,10 +88,7 @@ export default function CartPage() {
         <div className="text-center">
           <span className="text-8xl mb-4 opacity-30">🛒</span>
           <h1 className="text-2xl font-bold text-gray-700 mb-2">سلتك فارغة</h1>
-          <button 
-            onClick={() => router.push('/')} 
-            className="bg-[#FF8A5C] text-white px-8 py-3 rounded-full font-bold text-lg shadow-md hover:bg-[#E67A4F] transition-colors"
-          >
+          <button onClick={() => router.push('/')} className="bg-[#FF8A5C] text-white px-8 py-3 rounded-full font-bold text-lg shadow-md hover:bg-[#E67A4F] transition-colors">
             تصفح المنتجات
           </button>
         </div>
@@ -111,10 +101,7 @@ export default function CartPage() {
       {/* الهيدر */}
       <div className="bg-white sticky top-0 z-10 shadow-sm">
         <div className="flex items-center justify-between p-4">
-          <button
-            onClick={() => router.back()}
-            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
-          >
+          <button onClick={() => router.back()} className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors">
             <img src="/icons/arrow-left.png" alt="رجوع" className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-bold text-gray-800">سلة المشتريات</h1>
@@ -127,44 +114,20 @@ export default function CartPage() {
       {/* قائمة المنتجات */}
       <div className="p-4 space-y-4">
         {items.map((item) => (
-          <motion.div
-            key={item.id}
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-          >
+          <motion.div key={item.id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -50 }} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="flex p-3">
-              {/* صورة المنتج */}
               <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = '/icons/image-placeholder.png';
-                  }}
-                />
+                <img src={item.image} alt={item.name} className="w-full h-full object-cover" onError={(e) => { e.target.src = '/icons/image-placeholder.png'; }} />
               </div>
-
-              {/* تفاصيل المنتج */}
               <div className="flex-1 pr-3">
                 <div className="flex justify-between items-start">
                   <div className="flex-1 text-center">
-                    <h3 className="font-bold text-base text-gray-800">
-                      {getProductDescription(item)}
-                    </h3>
+                    <h3 className="font-bold text-base text-gray-800">{getProductDescription(item)}</h3>
                   </div>
-                  <button
-                    onClick={() => handleRemoveItem(item.id)}
-                    className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600 hover:bg-red-50 hover:text-red-500 transition-colors"
-                  >
-                    <span>✕</span>
-                    <span>حذف</span>
+                  <button onClick={() => handleRemoveItem(item.id)} className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600 hover:bg-red-50 hover:text-red-500 transition-colors">
+                    <span>✕</span><span>حذف</span>
                   </button>
                 </div>
-
                 <div className="flex justify-center items-center gap-1 mt-2">
                   <span className="text-lg font-bold text-[#2A7DE1]">{item.price}</span>
                   <span className="text-sm text-gray-500">درهم</span>
@@ -175,41 +138,22 @@ export default function CartPage() {
         ))}
       </div>
 
-      {/* الجزء السفلي الثابت */}
+      {/* الجزء السفلي */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
         <div className="max-w-md mx-auto">
           <div className="flex justify-between items-center mb-4 px-2">
-            <span className="text-2xl font-bold text-[#2A7DE1]">
-              {getTotalPrice()} <span className="text-sm text-gray-500">درهم</span>
-            </span>
+            <span className="text-2xl font-bold text-[#2A7DE1]">{getTotalPrice()} <span className="text-sm text-gray-500">درهم</span></span>
             <span className="text-gray-600 font-medium">المجموع الكلي</span>
           </div>
-
-          <button
-            onClick={handleCheckout}
-            disabled={isCheckingOut}
-            className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-green-700 transition-colors shadow-md"
-          >
+          <button onClick={handleCheckout} disabled={isCheckingOut} className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-green-700 transition-colors shadow-md">
             {isCheckingOut ? (
-              <>
-                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                <span>جاري التجهيز...</span>
-              </>
+              <><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span><span>جاري التجهيز...</span></>
             ) : (
-              <>
-                <img src="/icons/whatsapp.png" alt="واتساب" className="w-6 h-6" />
-                <span>اطلب الآن عبر واتساب</span>
-              </>
+              <><img src="/icons/whatsapp.png" alt="واتساب" className="w-6 h-6" /><span>اطلب الآن عبر واتساب</span></>
             )}
           </button>
-
           <div className="text-center mt-3">
-            <button
-              onClick={() => router.push('/')}
-              className="text-[#2A7DE1] hover:underline text-sm font-medium"
-            >
-              ← العودة للتسوق
-            </button>
+            <button onClick={() => router.push('/')} className="text-[#2A7DE1] hover:underline text-sm font-medium">← العودة للتسوق</button>
           </div>
         </div>
       </div>
