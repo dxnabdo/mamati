@@ -1,4 +1,6 @@
-// components/Layout/BottomBar.jsx
+// components/Layout/BottomBar.jsx (الجزء المعدل)
+// استبدال زر الإرشادات بزر فلتر
+
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -7,32 +9,26 @@ import DrawerMenu from '../UI/DrawerMenu';
 const BottomBar = ({ 
   cartCount = 0, 
   onAIClick, 
-  onInfoClick, 
-  onOffersClick, 
+  onInfoClick,      // هذا يمكن إلغاؤه أو الاحتفاظ به للإرشادات إذا أردت
+  onOffersClick,
   onWhatsAppClick,
   onSearch
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleMenuClick = () => {
-    setIsMenuOpen(true);
-  };
+  const handleMenuClick = () => setIsMenuOpen(true);
 
   return (
     <>
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-[#FF8A5C]/20 py-2 px-4 z-50 shadow-lg">
         <div className="flex justify-around items-center max-w-md mx-auto">
-          {/* أيقونة القائمة - تفتح DrawerMenu */}
-          <motion.button 
-            whileTap={{ scale: 0.9 }} 
-            onClick={handleMenuClick} 
-            className="flex flex-col items-center"
-          >
+          {/* أيقونة القائمة */}
+          <motion.button whileTap={{ scale: 0.9 }} onClick={handleMenuClick} className="flex flex-col items-center">
             <img src="/icons/menu.png" alt="القائمة" className="w-6 h-6" />
             <span className="text-xs mt-1 text-[#FF8A5C] font-medium">القائمة</span>
           </motion.button>
 
-          {/* أيقونة الذكاء الاصطناعي - تفتح مودال المحادثة */}
+          {/* أيقونة الذكاء الاصطناعي */}
           <motion.button whileTap={{ scale: 0.95 }} onClick={onAIClick} className="flex flex-col items-center">
             <img src="/icons/robot.png" alt="AI" className="w-6 h-6" />
             <span className="text-xs mt-1 text-gray-600">AI</span>
@@ -63,11 +59,13 @@ const BottomBar = ({
             </motion.div>
           </Link>
 
-          {/* أيقونة الإرشادات */}
-          <motion.button whileTap={{ scale: 0.9 }} onClick={onInfoClick} className="flex flex-col items-center">
-            <img src="/icons/info.png" alt="إرشادات" className="w-6 h-6" />
-            <span className="text-xs mt-1 text-gray-600">إرشادات</span>
-          </motion.button>
+          {/* زر الفلتر (بدلاً من الإرشادات) */}
+          <Link href="/filter">
+            <motion.button whileTap={{ scale: 0.9 }} className="flex flex-col items-center">
+              <img src="/icons/filter.png" alt="فلتر" className="w-6 h-6" />
+              <span className="text-xs mt-1 text-gray-600">فلتر</span>
+            </motion.button>
+          </Link>
 
           {/* أيقونة واتساب */}
           <motion.button whileTap={{ scale: 0.9 }} onClick={onWhatsAppClick} className="flex flex-col items-center">
@@ -77,7 +75,7 @@ const BottomBar = ({
         </div>
       </div>
 
-      {/* القائمة الجانبية */}
+      {/* القائمة الجانبية (يمكن أن تحتوي على رابط الإرشادات) */}
       <DrawerMenu 
         isOpen={isMenuOpen} 
         onClose={() => setIsMenuOpen(false)} 
