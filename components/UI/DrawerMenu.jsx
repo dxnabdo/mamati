@@ -8,23 +8,20 @@ const DrawerMenu = ({ isOpen, onClose, onSearch }) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    if (onSearch) {
-      onSearch(query);
-    }
-    // إذا كان المستخدم يريد التنقل إلى الصفحة الرئيسية مع نتيجة البحث، يمكن إضافة توجيه
-    if (query.trim() === '') {
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      // إذا كان الحقل فارغاً، احذف معامل البحث
       router.push('/');
     } else {
-      router.push(`/?search=${encodeURIComponent(query)}`);
+      router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
     }
+    onClose(); // إغلاق القائمة بعد البحث (اختياري)
   };
 
-  const handleClose = () => {
-    setSearchQuery('');
-    onClose();
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -36,7 +33,7 @@ const DrawerMenu = ({ isOpen, onClose, onSearch }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 z-50"
-            onClick={handleClose}
+            onClick={onClose}
           />
           <motion.div
             initial={{ x: '-100%' }}
@@ -47,29 +44,37 @@ const DrawerMenu = ({ isOpen, onClose, onSearch }) => {
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold">القائمة</h2>
-              <button onClick={handleClose} className="text-2xl">✕</button>
+              <button onClick={onClose} className="text-2xl">✕</button>
             </div>
 
-            {/* حقل البحث داخل القائمة */}
-            <div className="mb-6">
+            {/* حقل البحث مع زر صغير */}
+            <div className="flex gap-2 mb-6">
               <input
                 type="text"
                 placeholder="ابحث عن منتج..."
                 value={searchQuery}
-                onChange={handleSearchChange}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF8A5C]"
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF8A5C]"
               />
+              <button
+                onClick={handleSearch}
+                className="bg-[#FF8A5C] text-white px-3 py-2 rounded-lg text-sm hover:bg-[#E67A4F] transition"
+              >
+                بحث
+              </button>
             </div>
 
+            {/* روابط القائمة */}
             <nav className="flex flex-col gap-3">
-              <Link href="/" onClick={handleClose} className="hover:text-[#FF8A5C]">الرئيسية</Link>
-              <Link href="/favorites" onClick={handleClose} className="hover:text-[#FF8A5C]">المفضلة</Link>
-              <Link href="/cart" onClick={handleClose} className="hover:text-[#FF8A5C]">السلة</Link>
-              <Link href="/mamati-market" onClick={handleClose} className="hover:text-[#FF8A5C]">مامتي ماركيت</Link>
-              <Link href="/instructions" onClick={handleClose} className="hover:text-[#FF8A5C]">الإرشادات</Link>
-              <Link href="/delivery" onClick={handleClose} className="hover:text-[#FF8A5C]">سياسة التوصيل</Link>
-              <Link href="/exchange" onClick={handleClose} className="hover:text-[#FF8A5C]">الاستبدال</Link>
-              <Link href="/contact" onClick={handleClose} className="hover:text-[#FF8A5C]">تواصل معنا</Link>
+              <Link href="/" onClick={onClose} className="hover:text-[#FF8A5C]">الرئيسية</Link>
+              <Link href="/favorites" onClick={onClose} className="hover:text-[#FF8A5C]">المفضلة</Link>
+              <Link href="/cart" onClick={onClose} className="hover:text-[#FF8A5C]">السلة</Link>
+              <Link href="/mamati-market" onClick={onClose} className="hover:text-[#FF8A5C]">مامتي ماركيت</Link>
+              <Link href="/instructions" onClick={onClose} className="hover:text-[#FF8A5C]">الإرشادات</Link>
+              <Link href="/delivery" onClick={onClose} className="hover:text-[#FF8A5C]">سياسة التوصيل</Link>
+              <Link href="/exchange" onClick={onClose} className="hover:text-[#FF8A5C]">الاستبدال</Link>
+              <Link href="/contact" onClick={onClose} className="hover:text-[#FF8A5C]">تواصل معنا</Link>
             </nav>
           </motion.div>
         </>
