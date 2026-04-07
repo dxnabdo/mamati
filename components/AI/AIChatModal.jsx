@@ -8,6 +8,7 @@ const AIChatModal = ({ isOpen, onClose }) => {
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const listeningTimeoutRef = useRef(null);
 
   // إعدادات التعرف على الصوت
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
@@ -25,22 +26,64 @@ const AIChatModal = ({ isOpen, onClose }) => {
       setMessages([]);
       setInputValue("");
       resetTranscript();
+      if (listening) {
+        SpeechRecognition.stopListening();
+      }
+      if (listeningTimeoutRef.current) {
+        clearTimeout(listeningTimeoutRef.current);
+      }
     }
-  }, [isOpen, resetTranscript]);
+  }, [isOpen, resetTranscript, listening]);
 
   // التمرير التلقائي إلى آخر رسالة
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // إيقاف التسجيل تلقائياً بعد 5 ثوانٍ من بدايته
+  const autoStopListening = () => {
+    if (listeningTimeoutRef.current) clearTimeout(listeningTimeoutRef.current);
+    listeningTimeoutRef.current = setTimeout(() => {
+      if (listening) {
+        SpeechRecognition.stopListening();
+      }
+    }, 5000);
+  };
+
+  const startListening = () => {
+    if (!browserSupportsSpeechRecognition) {
+      alert("المتصفح لا يدعم الإدخال الصوتي. يُرجى استخدام Chrome أو Edge.");
+      return;
+    }
+    if (listening) {
+      SpeechRecognition.stopListening();
+      if (listeningTimeoutRef.current) clearTimeout(listeningTimeoutRef.current);
+    } else {
+      SpeechRecognition.startListening({ continuous: false, language: "ar" });
+      autoStopListening();
+    }
+  };
+
+  const stopListening = () => {
+    if (listening) {
+      SpeechRecognition.stopListening();
+    }
+    if (listeningTimeoutRef.current) {
+      clearTimeout(listeningTimeoutRef.current);
+    }
+  };
+
   const handleSendMessage = async () => {
     const text = inputValue.trim();
     if (!text || loading) return;
 
+    // إيقاف التسجيل الصوتي إذا كان نشطاً
+    stopListening();
+
     const userMessage = { role: "user", content: text };
     setMessages(prev => [...prev, { sender: "user", text }]);
     setInputValue("");
-    resetTranscript(); // مسح النص الصوتي بعد الإرسال
+    resetTranscript();
     setLoading(true);
 
     try {
@@ -75,18 +118,6 @@ const AIChatModal = ({ isOpen, onClose }) => {
       e.preventDefault();
       handleSendMessage();
     }
-  };
-
-  const startListening = () => {
-    if (browserSupportsSpeechRecognition) {
-      SpeechRecognition.startListening({ continuous: false, language: "ar" });
-    } else {
-      alert("المتصفح لا يدعم الإدخال الصوتي. يُرجى استخدام Chrome أو Edge.");
-    }
-  };
-
-  const stopListening = () => {
-    SpeechRecognition.stopListening();
   };
 
   if (!isOpen) return null;

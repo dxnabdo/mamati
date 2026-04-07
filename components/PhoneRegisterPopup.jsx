@@ -8,8 +8,15 @@ export default function PhoneRegisterPopup() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShow(true), 4000);
-    return () => clearTimeout(timer);
+    // التحقق مما إذا كانت النافذة ظهرت من قبل
+    const hasShown = localStorage.getItem("popupShown");
+    if (!hasShown) {
+      const timer = setTimeout(() => {
+        setShow(true);
+        localStorage.setItem("popupShown", "true");
+      }, 5000); // 5 ثوانٍ
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   const closePopup = () => setShow(false);
@@ -49,11 +56,9 @@ export default function PhoneRegisterPopup() {
       <div className="bg-white rounded-2xl p-6 w-[90%] max-w-md relative shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <button onClick={closePopup} className="absolute top-3 left-3 text-3xl text-black hover:opacity-70">✕</button>
         <div className="text-center">
-          {/* تكبير الشعار */}
           <img src="/mamaty-logo.png" alt="مامتي" className="h-20 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">متجر ماماتي للملابس الأوروبية</h2>
-          {/* إزالة إيموجي نار واحدة */}
-          <p className="text-lg text-orange-500 font-semibold mb-3">🔥 دخل رقمك وكون أول من يتوصل بالجديد.. قبل ما تسالي</p>
+          <p className="text-lg text-orange-500 font-semibold mb-3">🔥 دخل رقمك وكون أول من يتوصل بالجديد.. قبل ما يسالي</p>
           <input
             type="tel"
             placeholder="رقم الهاتف (واتساب)"
@@ -69,7 +74,7 @@ export default function PhoneRegisterPopup() {
           >
             {loading ? "جاري الإرسال..." : "أخبرني عند وصول الجديد"}
           </button>
-          <p className="mt-4 text-sm text-gray-500">🔥 % أكثر من 1000 شخص مشترك — رقمك آمن 100 </p>
+          <p className="mt-4 text-sm text-gray-500">🔥% أكثر من 1000 شخص مشترك — رقمك آمن 100</p>
           {message && (
             <p className={`mt-3 p-2 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
               {message}
