@@ -8,13 +8,14 @@ export default function PhoneRegisterPopup() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // نتحقق من وجود popupShown في localStorage
     const hasShown = localStorage.getItem("popupShown");
+    console.log("hasShown:", hasShown); // للتأكد
     if (!hasShown) {
       const timer = setTimeout(() => {
+        console.log("⏰ 6 seconds passed, showing popup");
         setShow(true);
         localStorage.setItem("popupShown", "true");
-      }, 6000); // 6 ثوانٍ
+      }, 6000);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -58,7 +59,7 @@ export default function PhoneRegisterPopup() {
         <div className="text-center">
           <img src="/mamaty-logo.png" alt="مامتي" className="h-20 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">متجر ماماتي للملابس الأوروبية</h2>
-          <p className="text-lg text-orange-500 font-semibold mb-3">🔥 دخل رقمك وكون أول من يتوصل بالجديد.. قبل ما يسالي</p>
+          <p className="text-lg text-orange-500 font-semibold mb-3">🔥 دخل رقمك وكون أول من يتوصل بالجديد.. قبل ما تسالي</p>
           <input
             type="tel"
             placeholder="رقم الهاتف (واتساب)"
@@ -74,7 +75,7 @@ export default function PhoneRegisterPopup() {
           >
             {loading ? "جاري الإرسال..." : "أخبرني عند وصول الجديد"}
           </button>
-          <p className="mt-4 text-sm text-gray-500">🔥 %أكثر من 1000 شخص مشترك — رقمك آمن 100</p>
+          <p className="mt-4 text-sm text-gray-500">🔥 أكثر من 1000 شخص مشترك — رقمك آمن 100%</p>
           {message && (
             <p className={`mt-3 p-2 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
               {message}
