@@ -8,10 +8,18 @@ const FilterModal = ({ isOpen, onClose }) => {
   const [age, setAge] = useState('');
   const [category, setCategory] = useState('');
 
+  // جميع خيارات العمر منتهية بكلمة "سنة" (ما عدا الأشهر تحتفظ بـ "أشهر")
   const ageOptions = [
-    '6 أشهر', '9 أشهر',
-    '1 سنة', '1.5 سنة',
-    '2-3 سنوات', '4-5 سنوات', '6-7 سنوات', '8-9 سنوات', '10-12 سنوات'
+    '6-9 أشهر',
+    '1-1.5 سنة',
+    '2-3 سنة',
+    '3-4 سنة',
+    '4-5 سنة',
+    '5-6 سنة',
+    '6-7 سنة',
+    '7-8 سنة',
+    '8-9 سنة',
+    '10-12 سنة'
   ];
 
   const handleApply = () => {
@@ -25,7 +33,7 @@ const FilterModal = ({ isOpen, onClose }) => {
   const handleReset = () => {
     setAge('');
     setCategory('');
-    router.push('/'); // إزالة الفلتر
+    router.push('/');
     onClose();
   };
 
