@@ -8,6 +8,7 @@ export default function PhoneRegisterPopup() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // نتحقق من وجود popupShown في localStorage
     const hasShown = localStorage.getItem("popupShown");
     if (!hasShown) {
       const timer = setTimeout(() => {

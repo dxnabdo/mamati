@@ -38,12 +38,19 @@ export default function AIChatModal({ isOpen, onClose }) {
     if (transcript) setInputValue(transcript);
   }, [transcript]);
 
-  // Reset when open
+  // Reset when open and add welcome message if empty
   useEffect(() => {
     if (isOpen) {
       resetTranscript();
       if (listening) SpeechRecognition.stopListening();
+      
+      // Add welcome message if no messages exist
+      if (messages.length === 0) {
+        const welcomeMessage = "✨ مرحباً بك في مساعد مامتي الذكي! ✨\n\nاسألني عن:\n• منتجات الأطقم\n• ملابس الأطفال (أولاد وبنات)\n• المنتجات المتنوعة في مامتي ماركيت\n\nأنا هنا لمساعدتك! 🛍️";
+        setMessages([{ sender: "ai", text: welcomeMessage }]);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   // Auto scroll
@@ -133,7 +140,7 @@ export default function AIChatModal({ isOpen, onClose }) {
         setTypingText("");
       }, reply.length * 15);
     } catch (err) {
-      setMessages((prev) => [...prev, { sender: "ai", text: "خطأ في الاتصال" }]);
+      setMessages((prev) => [...prev, { sender: "ai", text: "عذراً، حدث خطأ في الاتصال. حاول مرة أخرى." }]);
     } finally {
       setLoading(false);
     }
@@ -164,51 +171,67 @@ export default function AIChatModal({ isOpen, onClose }) {
           onClick={(e) => e.stopPropagation()}
           className="bg-white w-full sm:w-96 max-h-[90vh] rounded-t-2xl sm:rounded-2xl p-4 flex flex-col shadow-xl"
         >
-          <div className="flex justify-between items-center mb-2 pb-2 border-b">
-            <h2 className="font-bold">🤖 مساعد المتجر</h2>
-            <button onClick={onClose}>✕</button>
+          {/* رأس المودال مع أيقونة Generative */}
+          <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-200">
+            <div className="flex items-center gap-2">
+              <img src="/icons/generative.png" alt="Generative AI" className="w-5 h-5" />
+              <h2 className="text-lg font-bold text-gray-800">مساعد مامتي الذكي 🤖</h2>
+            </div>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-xl leading-5">✕</button>
           </div>
 
-          <div className="flex-1 overflow-y-auto space-y-2 mb-2">
+          {/* منطقة الرسائل */}
+          <div className="flex-1 overflow-y-auto space-y-2 mb-2 min-h-[200px] max-h-[50vh]">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-                <div className="px-3 py-2 rounded-lg bg-gray-100 max-w-[80%]">
+                <div className={`px-3 py-2 rounded-lg max-w-[80%] whitespace-pre-wrap ${msg.sender === "user" ? "bg-orange-100 text-orange-800" : "bg-gray-100 text-gray-800"}`}>
                   {msg.text}
                 </div>
               </div>
             ))}
-
             {typingText && (
-              <div className="bg-gray-200 p-2 rounded">
-                {typingText}
+              <div className="flex justify-start">
+                <div className="bg-gray-100 text-gray-800 px-3 py-2 rounded-lg">
+                  {typingText}
+                </div>
               </div>
             )}
-
             <div ref={messagesEndRef} />
           </div>
 
+          {/* حقل الإدخال مع زر الميكروفون */}
           <div className="flex gap-2 border-t pt-2">
             <textarea
               ref={textareaRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="اكتب..."
-              className="flex-1 border rounded-lg px-2 py-1"
+              placeholder="اكتب رسالتك هنا..."
+              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+              rows={1}
+              style={{ minHeight: '40px', maxHeight: '100px' }}
             />
-
-            <button onClick={startListening}>
+            <button
+              onClick={startListening}
+              disabled={!browserSupportsSpeechRecognition}
+              className={`p-2 rounded-lg ${listening ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'} hover:opacity-80 transition`}
+              title="إدخال صوتي"
+            >
               🎙️
             </button>
-
             <button
               onClick={handleSendMessage}
-              disabled={loading}
-              className="bg-orange-500 text-white px-3 rounded"
+              disabled={loading || !inputValue.trim()}
+              className="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 disabled:bg-gray-300 transition"
             >
-              إرسال
+              {loading ? "..." : "إرسال"}
             </button>
           </div>
+          {listening && (
+            <div className="text-xs text-green-600 mt-1 text-center">
+              ⏺️ جاري الاستماع... انقر الميكروفون مرة أخرى للإيقاف
+            </div>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
