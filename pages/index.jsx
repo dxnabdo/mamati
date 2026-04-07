@@ -116,17 +116,21 @@ export default function Home() {
     return categoryMap[categoryId] || { text: 'منتجات', icon: '/icons/star.png' };
   };
 
+  // البحث فقط حسب الفئة (أولاد، بنات، أطقم) بدون جنس
   const handleSearch = (query) => {
     if (!query || query.trim() === '') {
       setFilteredProducts(products);
       return;
     }
     const searchLower = query.toLowerCase().trim();
-    const filtered = products.filter(p =>
-      (p.name && p.name.toLowerCase().includes(searchLower)) ||
-      (p.faction && p.faction.toLowerCase().includes(searchLower)) ||
-      (p.price && p.price.toString().includes(searchLower))
-    );
+    const filtered = products.filter(p => {
+      let categoryName = '';
+      if (p.faction === 'boy') categoryName = 'أولاد';
+      else if (p.faction === 'girls') categoryName = 'بنات';
+      else if (p.faction === 'sets') categoryName = 'أطقم';
+      else categoryName = p.faction;
+      return categoryName.includes(searchLower);
+    });
     setFilteredProducts(filtered);
   };
 
@@ -217,7 +221,7 @@ export default function Home() {
         </Swiper>
       </div>
 
-      {/* شريط السوشيال ميديا - رقيق جداً، بدون مسافات */}
+      {/* شريط السوشيال ميديا - رقيق جداً */}
       <SocialStrip />
 
       {/* شريط الفئات - بدون هوامس علوية */}
