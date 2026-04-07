@@ -15,7 +15,7 @@ import ProductsGrid from '../components/Products/ProductsGrid';
 import ProductModal from '../components/Products/ProductModal';
 import AIChatModal from '../components/AI/AIChatModal';
 import PhoneRegisterPopup from "../components/PhoneRegisterPopup";
-import SocialStrip from '../components/Layout/SocialStrip';  // <-- إضافة الاستيراد
+import SocialStrip from '../components/Layout/SocialStrip';
 import { ToastContainer, toastManager } from '../components/UI/Toast';
 import { getAllProducts } from '../utils/productsParser';
 import useCartStore from '../utils/cartStore';
@@ -23,7 +23,6 @@ import useFavoritesStore from '../utils/favoritesStore';
 import { useSound } from '../hooks';
 
 export default function Home() {
-  // ... (جميع الـ hooks والحالات كما هي دون تغيير) ...
   const router = useRouter();
   const { playAddSound } = useSound();
 
@@ -190,7 +189,7 @@ export default function Home() {
         onFilterToggle={handleFilterToggle}
       />
 
-      {/* سلايدر البانر */}
+      {/* سلايدر البانر - بدون هوامس علوية/سفلية */}
       <div className="px-4 pt-0 pb-0">
         <Swiper
           modules={[Autoplay, Pagination]}
@@ -218,9 +217,10 @@ export default function Home() {
         </Swiper>
       </div>
 
-      {/* شريط السوشيال ميديا - تمت إضافته هنا */}
+      {/* شريط السوشيال ميديا - بدون هوامس ولا خطوط */}
       <SocialStrip />
 
+      {/* شريط الفئات - بدون هوامس علوية */}
       <CategoriesScroll 
         onCategorySelect={(catId) => setSelectedCategory(catId)} 
         products={products} 

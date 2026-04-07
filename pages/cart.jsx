@@ -1,349 +1,218 @@
 // pages/cart.jsx
-import React, { useState } from "react";
-import { useRouter } from "next/router";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import useCartStore from "../utils/cartStore";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/router';
+import useCartStore from '../../utils/cartStore';
+import { playSound } from '../../utils/soundEffects';
+import { showToast } from '../../utils/toastMessages';
 
 export default function CartPage() {
-
   const router = useRouter();
-  const { items, removeFromCart, clearCart, getTotalPrice } = useCartStore();
+  const { items, removeItem, getTotalPrice, getItemCount } = useCartStore();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const STORE_WHATSAPP = "212663319599";
-
-  // توليد السيريال
-  const generateSerial = (imageName) => {
-
-    if (!imageName) return "unknown";
-
-    const parts = imageName.split("_");
-
-    if (parts.length < 4) return "unknown";
-
-    const faction = parts[0];
-    const age = parts[1];
-    const price = parts[2];
-    const serialNum = parts[3];
-
-    const factionLetter =
-      faction === "boy" ? "B" :
-      faction === "girls" ? "G" : "S";
-
-    const paddedSerial = String(serialNum).padStart(4, "0");
-
-    return `${factionLetter}${age}${price}D${paddedSerial}`;
+  const handleRemoveItem = (productId) => {
+    removeItem(productId);
+    playSound('remove');
+    showToast('removed_from_cart', 'info');
   };
 
-  // استخراج تفاصيل المنتج
-  const getProductDetails = (product) => {
-
-    const imageName = product.image?.split("/").pop()?.split(".")[0] || "";
-
-    const parts = imageName.split("_");
-
-    const productType = parts[0];
-
-    let title = "";
-    let genderIcon = "";
-    let categoryText = "";
-    let categoryIcon = "";
-
-    if (productType === "sets") {
-
-      const gender = parts[1] || "boy";
-      const age = Number(parts[2]) || 2;
-
-      const genderText = gender === "boy" ? "ولد" : "بنت";
-
-      title = `طقم ${genderText} ${age}-${age - 1} سنوات`;
-
-      genderIcon = "🛍️";
-      categoryText = "أطقم";
-      categoryIcon = "/icons/star.png";
-
-    } else {
-
-      const gender = productType;
-      const age = Number(parts[1]) || 0;
-
-      const genderText = gender === "boy" ? "ولد" : "بنت";
-
-      title = `${genderText} ${age}-${age - 1} سنوات`;
-
-      genderIcon = gender === "boy" ? "👦" : "👧";
-
-      const price = Number(parts[2]) || product.price;
-
-      if (price >= 25 && price <= 40) {
-
-        categoryText = "اقتصادي";
-        categoryIcon = "/icons/eco.png";
-
-      } else if (price >= 45 && price <= 60) {
-
-        categoryText = "ممتاز";
-        categoryIcon = "/icons/star.png";
-
-      } else {
-
-        categoryText = "عادي";
-        categoryIcon = "/icons/star.png";
-
-      }
-
-    }
-
-    const serial = generateSerial(imageName);
-
-    return { title, genderIcon, categoryText, categoryIcon, serial };
+  const handleCheckout = () => {
+    setIsCheckingOut(true);
+    playSound('success');
+    const message = createWhatsAppMessage(items, getTotalPrice());
+    window.open(`https://wa.me/212663319599?text=${message}`, '_blank');
+    setIsCheckingOut(false);
+    showToast('order_sent', 'success');
   };
 
-  // إرسال الطلب
-  const handleWhatsApp = async () => {
-
-    if (items.length === 0) return;
-
-    setIsSubmitting(true);
-    setErrorMessage("");
-
-    const total = getTotalPrice();
-
-    const orderItems = items.map((item) => {
-
-      const { title, genderIcon, categoryText, serial } =
-        getProductDetails(item);
-
-      return {
-        serial,
-        title,
-        genderIcon,
-        category: categoryText,
-        price: item.price,
-        quantity: item.quantity || 1,
-        productUrl: `${window.location.origin}/product/${item.id}`,
-        imageUrl: item.image
+  // دالة موحدة للحصول على وصف المنتج (بدون سيريال)
+  const getProductDescription = (item) => {
+    // التأكد من أن السعر رقم
+    const priceNum = Number(item.price);
+    
+    // منتجات مامتي ماركيت
+    if (item.isMamatiMarket) {
+      const typeMap = {
+        bag: 'حقيبة',
+        tshirt: 'تي شيرت',
+        pants: 'سروال',
+        shoes: 'حذاء',
+        dress: 'فستان',
+        jacket: 'جاكيت',
+        accessory: 'إكسسوار'
       };
-
-    });
-
-    try {
-
-      const response = await fetch("/api/order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          items: orderItems,
-          total,
-          phone: ""
-        })
-      });
-
-      let result = {};
-
-      try {
-        result = await response.json();
-      } catch {
-        throw new Error("الرد من الخادم غير صالح");
-      }
-
-      if (!response.ok) {
-        throw new Error(result.message || "فشل إرسال الطلب");
-      }
-
-      console.log("تم إرسال الطلب:", result);
-
-      // رسالة واتساب
-      let message = "🛍️ *طلب جديد من مامتي*\n\n";
-      message += "━━━━━━━━━━━━━━━\n\n";
-
-      orderItems.forEach((item, index) => {
-
-        message += `*المنتج ${index + 1}:*\n`;
-        message += `${item.genderIcon} ${item.title}\n`;
-        message += `🏷️ التصنيف: ${item.category}\n`;
-        message += `💰 السعر: ${item.price} درهم\n`;
-        message += `🔢 الكمية: ${item.quantity}\n`;
-        message += `🆔 السيريال: ${item.serial}\n`;
-        message += `🔗 الرابط: ${item.productUrl}\n\n`;
-
-      });
-
-      message += "━━━━━━━━━━━━━━━\n";
-      message += `*المجموع:* ${total} درهم\n\n`;
-      message += "🌐 mamaty.ma";
-
-      window.open(
-        `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(message)}`,
-        "_blank"
-      );
-
-    } catch (error) {
-
-      console.error("خطأ:", error);
-
-      setErrorMessage(
-        error.message || "حدث خطأ أثناء إرسال الطلب"
-      );
-
-    } finally {
-
-      setIsSubmitting(false);
-
+      const typeArabic = typeMap[item.type] || item.type || 'منتج';
+      const sizeText = item.size ? ` ${item.size}` : '';
+      return `🛍️ ${typeArabic}${sizeText}`;
     }
 
+    // المنتجات العادية
+    const genderIcon = { 'boy': '👦', 'girls': '👧', 'sets': '🎁' };
+    const icon = genderIcon[item.faction] || '';
+    const genderText = { 'boy': 'ولد', 'girls': 'بنت', 'sets': 'أطقم' };
+    const text = genderText[item.faction] || '';
+
+    // تحديد التصنيف بدقة
+    let category = '';
+    if (item.faction === 'sets') {
+      category = 'أطقم';
+    } else if (priceNum >= 25 && priceNum <= 40) {
+      category = 'اقتصادي';
+    } else if (priceNum >= 45 && priceNum <= 60) {
+      category = 'ممتاز';
+    } else {
+      // إذا كان السعر خارج النطاق، نعرض "عادي"
+      category = 'عادي';
+    }
+
+    if (item.faction === 'boy' || item.faction === 'girls') {
+      return `${icon} ${text} ${item.size} سنوات (${category})`;
+    }
+    return `${icon} ${text} (${category})`;
+  };
+
+  // رسالة واتساب (بدون سيريال)
+  const createWhatsAppMessage = (items, totalPrice) => {
+    let productsList = '';
+    items.forEach((item, index) => {
+      const description = getProductDescription(item);
+      const productUrl = `${window.location.origin}/product/${item.id}`;
+      productsList += `${index + 1}. ${description} - ${item.price} درهم\n`;
+      productsList += `   🔗 رابط المنتج: ${productUrl}\n\n`;
+    });
+    return encodeURIComponent(
+      `🛍️ *أريد طلب المنتجات التالية:*\n\n` +
+      `${productsList}` +
+      `💰 *المجموع الكلي:* ${totalPrice} درهم\n\n` +
+      `✅ شكراً، في انتظار تأكيد الطلب`
+    );
   };
 
   if (items.length === 0) {
-
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FFF9F5] to-white p-4">
-
-        <div className="text-center py-12">
-
-          <span className="text-8xl mb-4 block opacity-30">🛒</span>
-
-          <p className="text-gray-500 text-lg mb-4">
-            سلة التسوق فارغة
-          </p>
-
-          <button
-            onClick={() => router.push("/")}
-            className="bg-[#FF8A5C] text-white px-6 py-3 rounded-xl"
+      <div className="min-h-screen bg-gradient-to-br from-[#FFF9F5] to-white flex items-center justify-center p-4">
+        <div className="text-center">
+          <span className="text-8xl mb-4 opacity-30">🛒</span>
+          <h1 className="text-2xl font-bold text-gray-700 mb-2">سلتك فارغة</h1>
+          <button 
+            onClick={() => router.push('/')} 
+            className="bg-[#FF8A5C] text-white px-8 py-3 rounded-full font-bold text-lg shadow-md hover:bg-[#E67A4F] transition-colors"
           >
-            تسوق الآن
+            تصفح المنتجات
           </button>
-
         </div>
-
       </div>
     );
-
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFF9F5] to-white p-4 pb-28">
-
-      {/* رأس الصفحة */}
-      <div className="flex items-center justify-between mb-6">
-
-        <button onClick={() => router.back()} className="p-2">
-          <img src="/icons/arrow-left.png" className="w-5 h-5"/>
-        </button>
-
-        <h1 className="text-xl font-bold">
-          سلة المشتريات
-        </h1>
-
-        <button
-          onClick={clearCart}
-          className="text-red-500 text-sm border border-red-500 px-2 py-1 rounded"
-        >
-          تفريغ السلة
-        </button>
-
-      </div>
-
-      {/* المنتجات */}
-      <div className="space-y-4">
-
-        {items.map((item) => {
-
-          const {
-            title,
-            genderIcon,
-            categoryText,
-            categoryIcon,
-            serial
-          } = getProductDetails(item);
-
-          return (
-
-            <div
-              key={item.id}
-              className="bg-white rounded-xl p-3 shadow-sm flex gap-3 items-center"
-            >
-
-              <img
-                src={item.image}
-                className="w-24 h-24 object-cover rounded-lg cursor-pointer"
-                onClick={() => setSelectedImage(item.image)}
-              />
-
-              <div className="flex-1 text-center">
-
-                <h3
-                  className="font-semibold cursor-pointer"
-                  onClick={() => router.push(`/product/${item.id}`)}
-                >
-                  {genderIcon} {title}
-                </h3>
-
-                <div className="flex justify-center gap-1 mt-1">
-                  <img src={categoryIcon} className="w-4 h-4"/>
-                  <span className="text-xs text-gray-600">
-                    {categoryText}
-                  </span>
-                </div>
-
-                <p className="text-blue-600 font-bold mt-1">
-                  {item.price} درهم
-                </p>
-
-                <p className="text-xs text-gray-400">
-                  السيريال: {serial}
-                </p>
-
-              </div>
-
-              <button
-                onClick={() => removeFromCart(item.id)}
-                className="text-red-500"
-              >
-                🗑️
-              </button>
-
-            </div>
-
-          );
-
-        })}
-
-      </div>
-
-      {/* رسالة الخطأ */}
-      {errorMessage && (
-        <div className="text-red-500 text-center mt-3">
-          {errorMessage}
-        </div>
-      )}
-
-      {/* زر الطلب */}
-      <div className="fixed bottom-20 left-0 right-0 bg-white border-t p-4">
-
-        <div className="flex justify-between mb-3">
-          <span>المجموع</span>
-          <span className="text-xl font-bold text-blue-600">
-            {getTotalPrice()} درهم
+    <div className="min-h-screen bg-gradient-to-br from-[#FFF9F5] to-white pb-32">
+      {/* الهيدر */}
+      <div className="bg-white sticky top-0 z-10 shadow-sm">
+        <div className="flex items-center justify-between p-4">
+          <button
+            onClick={() => router.back()}
+            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <img src="/icons/arrow-left.png" alt="رجوع" className="w-5 h-5" />
+          </button>
+          <h1 className="text-xl font-bold text-gray-800">سلة المشتريات</h1>
+          <span className="bg-[#FF8A5C] text-white px-3 py-1 rounded-full text-sm">
+            {getItemCount()} {getItemCount() === 1 ? 'منتج' : 'منتجات'}
           </span>
         </div>
-
-        <button
-          onClick={handleWhatsApp}
-          disabled={isSubmitting}
-          className="w-full bg-green-500 text-white py-3 rounded-xl"
-        >
-          {isSubmitting ? "جاري الإرسال..." : "اطلب عبر واتساب"}
-        </button>
-
       </div>
 
+      {/* قائمة المنتجات */}
+      <div className="p-4 space-y-4">
+        {items.map((item) => (
+          <motion.div
+            key={item.id}
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <div className="flex p-3">
+              {/* صورة المنتج */}
+              <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = '/icons/image-placeholder.png';
+                  }}
+                />
+              </div>
+
+              {/* تفاصيل المنتج */}
+              <div className="flex-1 pr-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1 text-center">
+                    <h3 className="font-bold text-base text-gray-800">
+                      {getProductDescription(item)}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveItem(item.id)}
+                    className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600 hover:bg-red-50 hover:text-red-500 transition-colors"
+                  >
+                    <span>✕</span>
+                    <span>حذف</span>
+                  </button>
+                </div>
+
+                <div className="flex justify-center items-center gap-1 mt-2">
+                  <span className="text-lg font-bold text-[#2A7DE1]">{item.price}</span>
+                  <span className="text-sm text-gray-500">درهم</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* الجزء السفلي الثابت */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+        <div className="max-w-md mx-auto">
+          <div className="flex justify-between items-center mb-4 px-2">
+            <span className="text-2xl font-bold text-[#2A7DE1]">
+              {getTotalPrice()} <span className="text-sm text-gray-500">درهم</span>
+            </span>
+            <span className="text-gray-600 font-medium">المجموع الكلي</span>
+          </div>
+
+          <button
+            onClick={handleCheckout}
+            disabled={isCheckingOut}
+            className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-green-700 transition-colors shadow-md"
+          >
+            {isCheckingOut ? (
+              <>
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <span>جاري التجهيز...</span>
+              </>
+            ) : (
+              <>
+                <img src="/icons/whatsapp.png" alt="واتساب" className="w-6 h-6" />
+                <span>اطلب الآن عبر واتساب</span>
+              </>
+            )}
+          </button>
+
+          <div className="text-center mt-3">
+            <button
+              onClick={() => router.push('/')}
+              className="text-[#2A7DE1] hover:underline text-sm font-medium"
+            >
+              ← العودة للتسوق
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
-
 }

@@ -1,76 +1,48 @@
+// components/Layout/SocialStrip.jsx
 import React from 'react';
 
 const SocialStrip = () => {
   return (
-    // ✅ تغيير fixed إلى sticky
-    <div className="bg-white border-b border-gray-200 pt-[18px] pb-0 px-[8px] sticky top-0 z-40">
-      <div className="flex justify-center items-center gap-6">
-        
-        {/* فيسبوك */}
+    <div className="flex justify-between items-center py-2 px-4 bg-white/50">
+      {/* جهة اليمين: أيقونات التواصل على شكل أزرار خضراء فاتحة */}
+      <div className="flex gap-3">
         <a 
-          href="https://https://www.facebook.com/" 
+          href="https://www.tiktok.com/@mamaty_bal_marrakech?_r=1&_t=ZS-95EfmGgNeCY" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="hover:opacity-80 transition-opacity flex items-center justify-center"
+          className="bg-[#A8E6CF] hover:bg-[#8fd4bb] transition-colors p-2 rounded-full"
         >
-          <img 
-            src="/icons/facebook.png" 
-            alt="فيسبوك" 
-            className="w-5 h-5"
-          />
+          <img src="/icons/tiktok.png" alt="تيك توك" className="w-5 h-5" />
         </a>
-
-        {/* انستغرام */}
         <a 
-          href="https://www.instagram.com" 
+          href="https://www.instagram.com/mamaty__bal_marrakech?igsh=endqOHcwMmU1MGFq" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="hover:opacity-80 transition-opacity flex items-center justify-center"
+          className="bg-[#A8E6CF] hover:bg-[#8fd4bb] transition-colors p-2 rounded-full"
         >
-          <img 
-            src="/icons/instagram.png" 
-            alt="انستغرام" 
-            className="w-5 h-5"
-          />
+          <img src="/icons/instagram.png" alt="انستغرام" className="w-5 h-5" />
         </a>
-
-        {/* تيك توك */}
         <a 
-          href="https://tiktok.com" 
+          href="https://www.facebook.com/share/1EGQ2yrJZs/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="hover:opacity-80 transition-opacity flex items-center justify-center"
+          className="bg-[#A8E6CF] hover:bg-[#8fd4bb] transition-colors p-2 rounded-full"
         >
-          <img 
-            src="/icons/tiktok.png" 
-            alt="تيك توك" 
-            className="w-5 h-5"
-          />
+          <img src="/icons/facebook.png" alt="فيسبوك" className="w-5 h-5" />
         </a>
-
-        {/* يوتيوب */}
         <a 
-          href="https://youtube.com" 
+          href="https://www.youtube.com/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="hover:opacity-80 transition-opacity flex items-center justify-center"
+          className="bg-[#A8E6CF] hover:bg-[#8fd4bb] transition-colors p-2 rounded-full"
         >
-          <img 
-            src="/icons/youtube.png" 
-            alt="يوتيوب" 
-            className="w-5 h-5"
-          />
+          <img src="/icons/youtube.png" alt="يوتيوب" className="w-5 h-5" />
         </a>
-
-        {/* جيميل */}
-        <div className="cursor-default flex items-center justify-center">
-          <img 
-            src="/icons/gmail.png" 
-            alt="جيميل" 
-            className="w-5 h-5 opacity-80 hover:opacity-100 transition-opacity"
-          />
-        </div>
-
+      </div>
+      {/* جهة اليسار: نص "تابعنا على" مع سهم */}
+      <div className="flex items-center gap-1 text-sm text-gray-600">
+        <span className="font-medium">تابعنا على</span>
+        <span className="text-base">➡️</span>
       </div>
     </div>
   );
