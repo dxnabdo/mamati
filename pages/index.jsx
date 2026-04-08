@@ -41,11 +41,8 @@ export default function Home() {
     size: 'الكل'
   });
 
-  const { getItemCount, items: cartItems } = useCartStore();
+  const { getItemCount } = useCartStore();
   const { items: favoriteItems } = useFavoritesStore();
-
-  // مجموعة معرفات المنتجات الموجودة في السلة (لإخفائها من العرض)
-  const cartProductIds = new Set(cartItems.map(item => item.id));
 
   useEffect(() => {
     const { category } = router.query;
@@ -152,9 +149,8 @@ export default function Home() {
     setFilteredProducts(filtered);
   }, [selectedCategory, products, mamatiProducts, router.query]);
 
-  // إخفاء المنتجات الموجودة في السلة من النتائج المعروضة
-  const visibleProducts = filteredProducts.filter(p => !cartProductIds.has(p.id));
-  const visibleMamatiProducts = mamatiProducts.filter(p => !cartProductIds.has(p.id));
+  // لا نقوم بإخفاء المنتجات المضافة إلى السلة
+  // نستخدم filteredProducts مباشرة و mamatiProducts مباشرة
 
   const getCategoryDisplay = (categoryId) => {
     if (categoryId === null) return { text: 'جميع المنتجات', icon: '/icons/star.png' };
@@ -273,8 +269,7 @@ export default function Home() {
       />
 
       <div className="px-4 pt-2 pb-28">
-        {/* بطاقة مامتي ماركيت – تظهر فقط عند عدم وجود أي فلتر ولا فئة محددة */}
-        {selectedCategory === null && !router.query.age && !router.query.category && !router.query.search && visibleMamatiProducts.length > 0 && (
+        {selectedCategory === null && !router.query.age && !router.query.category && !router.query.search && mamatiProducts.length > 0 && (
           <div className="mb-6 p-4 rounded-lg relative overflow-hidden" style={{ backgroundColor: '#F7F5F2' }}>
             <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute top-4 left-4 text-4xl">👛</div>
@@ -291,7 +286,7 @@ export default function Home() {
             </h2>
 
             <ProductsGrid
-              products={visibleMamatiProducts.slice(0, 4)}
+              products={mamatiProducts.slice(0, 4)}
               categoryInfo={{ text: 'مامتي ماركيت', icon: '/icons/mamati.png' }}
               onProductPress={handleProductPress}
               hideViewMode={true}
@@ -310,14 +305,14 @@ export default function Home() {
           </div>
         )}
 
-        {visibleProducts.length === 0 ? (
+        {filteredProducts.length === 0 ? (
           <div className="text-center py-12 bg-white/50 rounded-2xl">
             <span className="text-6xl mb-4 block opacity-30">👶</span>
             <p className="text-gray-500">لا توجد منتجات في هذه الفئة</p>
           </div>
         ) : (
           <ProductsGrid
-            products={visibleProducts}
+            products={filteredProducts}
             categoryInfo={categoryDisplay}
             onProductPress={handleProductPress}
           />
