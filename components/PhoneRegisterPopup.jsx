@@ -8,7 +8,7 @@ export default function PhoneRegisterPopup() {
   const [loading, setLoading] = useState(false);
 
   // ⚠️ استبدل هذا الرابط برابط Web App الخاص بك من Google Apps Script
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2BWc9cdqHjm2PicYDvAA7hZFa6qft01T1zfHc8XfkQuKbZLyMEZHvKi8MuptZUrbL/exec";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgt2Zl6sQKO5L9_EYnObASxWkNSKX49yq-jwIlCTgPpQFWPhPiMRXLt07bZwG9sT8L/exec";
 
   useEffect(() => {
     const hasShown = localStorage.getItem("popupShown");
