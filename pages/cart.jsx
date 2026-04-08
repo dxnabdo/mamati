@@ -71,8 +71,8 @@ export default function CartPage() {
     let lastOrder = localStorage.getItem('lastOrderNumber');
     let orderNumber = lastOrder ? parseInt(lastOrder) + 1 : 1;
     localStorage.setItem('lastOrderNumber', orderNumber);
-    // الرقم بصيغة #MAMATI-0001
-    const orderNumberFormatted = `#MAMATI-${String(orderNumber).padStart(4, '0')}`;
+    // الرقم بصيغة MAMATI1-0001 (بدون هاشتاج)
+    const orderNumberFormatted = `MAMATI1-${String(orderNumber).padStart(4, '0')}`;
 
     let productsList = '';
     items.forEach((item, index) => {
