@@ -67,19 +67,30 @@ export default function CartPage() {
   };
 
   const createWhatsAppMessage = (items, totalPrice) => {
+    // توليد رقم طلب تسلسلي (يزداد في كل طلب)
+    let lastOrder = localStorage.getItem('lastOrderNumber');
+    let orderNumber = lastOrder ? parseInt(lastOrder) + 1 : 1;
+    localStorage.setItem('lastOrderNumber', orderNumber);
+    const orderNumberFormatted = `MAMATI-${String(orderNumber).padStart(4, '0')}`;
+
     let productsList = '';
     items.forEach((item, index) => {
       const description = getProductDescription(item);
-      const productUrl = `${window.location.origin}/product/${item.id}`;
-      productsList += `${index + 1}. ${description} - ${item.price} درهم\n`;
-      productsList += `   🔗 رابط المنتج: ${productUrl}\n\n`;
+      // إزالة النص بين قوسين (التصنيف) لجعل الاسم أنظف
+      const cleanDesc = description.replace(/\s*\([^)]*\)/g, '');
+      productsList += `${index + 1}. ${cleanDesc} - ${item.price} درهم\n`;
+      productsList += `   🔗 الرابط: ${window.location.origin}/product/${item.id}\n`;
     });
-    return encodeURIComponent(
-      `🛍️ *أريد طلب المنتجات التالية:*\n\n` +
-      `${productsList}` +
-      `💰 *المجموع الكلي:* ${totalPrice} درهم\n\n` +
-      `✅ شكراً، في انتظار تأكيد الطلب`
-    );
+
+    const message = 
+`🛍️ *MAMATI طلب شراء من متجر🛍️
+${productsList}
+━━━━━━━━━━━━━━━━━━━━
+💰 *المجموع الكلي:* ${totalPrice} درهم
+📋 *رقم الطلب:* #${orderNumberFormatted}
+✨ شكراً لتسوقك من مامتي!`;
+
+    return encodeURIComponent(message);
   };
 
   if (items.length === 0) {
