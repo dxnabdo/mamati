@@ -7,8 +7,8 @@ export default function PhoneRegisterPopup() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ⚠️ ضع هنا رابط Web App الخاص بك الذي حصلت عليه من Google Apps Script
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxcTN9A12poABNU5jHHcGBvuNQIgpcDVepvsY_h1p3-pZj_zBLv4pbu1TsO4OQL9mdh/exec";
+  // ⚠️ استبدل هذا الرابط برابط Web App الخاص بك من Google Apps Script
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2BWc9cdqHjm2PicYDvAA7hZFa6qft01T1zfHc8XfkQuKbZLyMEZHvKi8MuptZUrbL/exec";
 
   useEffect(() => {
     const hasShown = localStorage.getItem("popupShown");
@@ -34,15 +34,13 @@ export default function PhoneRegisterPopup() {
       const payload = {
         date: new Date().toLocaleString("ar-EG"),
         phone: phone.trim(),
-        id: Date.now().toString() // معرف فريد (يمكنك تعديله)
+        id: Date.now().toString()
       };
-      
       const res = await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      
       const result = await res.json();
       if (result.success) {
         setMessage("✅ تم التسجيل بنجاح!");
@@ -68,7 +66,7 @@ export default function PhoneRegisterPopup() {
         <div className="text-center">
           <img src="/mamaty-logo.png" alt="مامتي" className="h-20 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">متجر ماماتي للملابس الأوروبية</h2>
-          <p className="text-lg text-orange-500 font-semibold mb-3">🔥 دخل رقمك وكون أول من يتوصل بالجديد.. قبل ما تسالي</p>
+          <p className="text-lg text-orange-500 font-semibold mb-3"> دخل رقمك وكون أول من يتوصل بالجديد.. قبل ما يسالي</p>
           <input
             type="tel"
             placeholder="رقم الهاتف (واتساب)"
@@ -84,7 +82,7 @@ export default function PhoneRegisterPopup() {
           >
             {loading ? "جاري الإرسال..." : "أخبرني عند وصول الجديد"}
           </button>
-          <p className="mt-4 text-sm text-gray-500">🔥 أكثر من 1000 شخص مشترك — رقمك آمن 100%</p>
+          <p className="mt-4 text-sm text-gray-500">🔥% أكثر من 1000 شخص مشترك — رقمك آمن 100%</p>
           {message && (
             <p className={`mt-3 p-2 rounded-lg ${message.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
               {message}
