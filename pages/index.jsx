@@ -41,10 +41,12 @@ export default function Home() {
     size: 'الكل'
   });
 
-  const { getItemCount } = useCartStore();
+  const { getItemCount, items: cartItems } = useCartStore();
   const { items: favoriteItems } = useFavoritesStore();
 
-  // Handle category from query param (banner click)
+  // مجموعة معرفات المنتجات الموجودة في السلة (لإخفائها من العرض)
+  const cartProductIds = new Set(cartItems.map(item => item.id));
+
   useEffect(() => {
     const { category } = router.query;
     if (category === 'mixed_sets') {
@@ -52,7 +54,6 @@ export default function Home() {
     }
   }, [router.query]);
 
-  // Handle search from query param (drawer menu search)
   useEffect(() => {
     const { search } = router.query;
     if (search && typeof search === 'string') {
@@ -60,7 +61,6 @@ export default function Home() {
     }
   }, [router.query]);
 
-  // Load all products
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -81,11 +81,9 @@ export default function Home() {
     loadProducts();
   }, []);
 
-  // Filter by selectedCategory (from CategoriesScroll) and also by query parameters (age & category)
   useEffect(() => {
     let filtered = [...products];
 
-    // First, filter by selectedCategory if any (from categories scroll)
     if (selectedCategory !== null && selectedCategory !== 'mamati-market') {
       switch (selectedCategory) {
         case 'boys-economy':
@@ -110,7 +108,6 @@ export default function Home() {
       filtered = mamatiProducts;
     }
 
-    // Apply filter from URL query parameters (age and category)
     const { age: ageParam, category: filterCategoryParam, search } = router.query;
     if (filterCategoryParam) {
       if (filterCategoryParam === 'أولاد') {
@@ -123,35 +120,23 @@ export default function Home() {
     }
     if (ageParam) {
       filtered = filtered.filter(p => {
-        const productAge = parseFloat(p.size); // support decimals (0.5, 1.5)
+        const productAge = parseFloat(p.size);
         if (isNaN(productAge)) return false;
         switch (ageParam) {
-          case '6-9 أشهر':
-            return productAge >= 0.5 && productAge <= 0.75;
-          case '1-1.5 سنة':
-            return productAge >= 1 && productAge <= 1.5;
-          case '2-3 سنة':
-            return productAge >= 2 && productAge <= 3;
-          case '3-4 سنة':
-            return productAge >= 3 && productAge <= 4;
-          case '4-5 سنة':
-            return productAge >= 4 && productAge <= 5;
-          case '5-6 سنة':
-            return productAge >= 5 && productAge <= 6;
-          case '6-7 سنة':
-            return productAge >= 6 && productAge <= 7;
-          case '7-8 سنة':
-            return productAge >= 7 && productAge <= 8;
-          case '8-9 سنة':
-            return productAge >= 8 && productAge <= 9;
-          case '10-12 سنة':
-            return productAge >= 10 && productAge <= 12;
-          default:
-            return true;
+          case '6-9 أشهر': return productAge >= 0.5 && productAge <= 0.75;
+          case '1-1.5 سنة': return productAge >= 1 && productAge <= 1.5;
+          case '2-3 سنة': return productAge >= 2 && productAge <= 3;
+          case '3-4 سنة': return productAge >= 3 && productAge <= 4;
+          case '4-5 سنة': return productAge >= 4 && productAge <= 5;
+          case '5-6 سنة': return productAge >= 5 && productAge <= 6;
+          case '6-7 سنة': return productAge >= 6 && productAge <= 7;
+          case '7-8 سنة': return productAge >= 7 && productAge <= 8;
+          case '8-9 سنة': return productAge >= 8 && productAge <= 9;
+          case '10-12 سنة': return productAge >= 10 && productAge <= 12;
+          default: return true;
         }
       });
     }
-    // Apply search filter if present (overrides other filters? we keep it last)
     if (search && typeof search === 'string') {
       const searchLower = search.toLowerCase().trim();
       filtered = filtered.filter(p => {
@@ -167,6 +152,10 @@ export default function Home() {
     setFilteredProducts(filtered);
   }, [selectedCategory, products, mamatiProducts, router.query]);
 
+  // إخفاء المنتجات الموجودة في السلة من النتائج المعروضة
+  const visibleProducts = filteredProducts.filter(p => !cartProductIds.has(p.id));
+  const visibleMamatiProducts = mamatiProducts.filter(p => !cartProductIds.has(p.id));
+
   const getCategoryDisplay = (categoryId) => {
     if (categoryId === null) return { text: 'جميع المنتجات', icon: '/icons/star.png' };
     const categoryMap = {
@@ -180,7 +169,6 @@ export default function Home() {
     return categoryMap[categoryId] || { text: 'منتجات', icon: '/icons/star.png' };
   };
 
-  // Search only by category name (أولاد، بنات، أطقم)
   const handleSearch = (query) => {
     if (!query || query.trim() === '') {
       const params = new URLSearchParams(router.query);
@@ -188,9 +176,7 @@ export default function Home() {
       router.push({ pathname: '/', query: params.toString() });
       return;
     }
-    const searchLower = query.toLowerCase().trim();
-    // We'll set query param and let useEffect handle filtering
-    router.push(`/?search=${encodeURIComponent(searchLower)}`);
+    router.push(`/?search=${encodeURIComponent(query.trim())}`);
   };
 
   const handleFilterToggle = () => setShowFilter(!showFilter);
@@ -287,8 +273,8 @@ export default function Home() {
       />
 
       <div className="px-4 pt-2 pb-28">
-        {/* Mamati Market card - shown only when no filter is active and no category selected from scroll */}
-        {selectedCategory === null && !router.query.age && !router.query.category && !router.query.search && mamatiProducts.length > 0 && (
+        {/* بطاقة مامتي ماركيت – تظهر فقط عند عدم وجود أي فلتر ولا فئة محددة */}
+        {selectedCategory === null && !router.query.age && !router.query.category && !router.query.search && visibleMamatiProducts.length > 0 && (
           <div className="mb-6 p-4 rounded-lg relative overflow-hidden" style={{ backgroundColor: '#F7F5F2' }}>
             <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute top-4 left-4 text-4xl">👛</div>
@@ -305,7 +291,7 @@ export default function Home() {
             </h2>
 
             <ProductsGrid
-              products={mamatiProducts.slice(0, 4)}
+              products={visibleMamatiProducts.slice(0, 4)}
               categoryInfo={{ text: 'مامتي ماركيت', icon: '/icons/mamati.png' }}
               onProductPress={handleProductPress}
               hideViewMode={true}
@@ -324,14 +310,14 @@ export default function Home() {
           </div>
         )}
 
-        {filteredProducts.length === 0 ? (
+        {visibleProducts.length === 0 ? (
           <div className="text-center py-12 bg-white/50 rounded-2xl">
             <span className="text-6xl mb-4 block opacity-30">👶</span>
             <p className="text-gray-500">لا توجد منتجات في هذه الفئة</p>
           </div>
         ) : (
           <ProductsGrid
-            products={filteredProducts}
+            products={visibleProducts}
             categoryInfo={categoryDisplay}
             onProductPress={handleProductPress}
           />
