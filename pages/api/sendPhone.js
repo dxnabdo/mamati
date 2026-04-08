@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   try {
     // ضع هنا رابط Google Apps Script الذي نشرته كـ Web App
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbxEZ_qLopoCHusu_bFGt_rfUFjOuTny0ef5jqcEPWV_-WCJkSkYYE451jnUyx3ieCQp/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxB_RswIiUOjhHj4VNg2O0TUqrrnipkSwaScooCtSECxw5Rk_AJQsD22uBabrK7390B/exec";
 
     // إرسال الرقم إلى Google Apps Script
     const response = await fetch(scriptUrl, {
