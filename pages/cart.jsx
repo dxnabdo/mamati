@@ -22,7 +22,7 @@ export default function CartPage() {
     playSound('success');
     const message = createWhatsAppMessage(items, getTotalPrice());
     window.open(`https://wa.me/212663319599?text=${message}`, '_blank');
-    clearCart(); // تفريغ السلة بعد فتح واتساب
+    clearCart();
     setIsCheckingOut(false);
     showToast('order_sent', 'success');
   };
@@ -67,28 +67,27 @@ export default function CartPage() {
   };
 
   const createWhatsAppMessage = (items, totalPrice) => {
-    // توليد رقم طلب تسلسلي (يزداد في كل طلب)
+    // توليد رقم طلب تسلسلي
     let lastOrder = localStorage.getItem('lastOrderNumber');
     let orderNumber = lastOrder ? parseInt(lastOrder) + 1 : 1;
     localStorage.setItem('lastOrderNumber', orderNumber);
-    const orderNumberFormatted = `MAMATI-${String(orderNumber).padStart(4, '0')}`;
+    // الرقم بصيغة #MAMATI-0001
+    const orderNumberFormatted = `#MAMATI-${String(orderNumber).padStart(4, '0')}`;
 
     let productsList = '';
     items.forEach((item, index) => {
       const description = getProductDescription(item);
-      // إزالة النص بين قوسين (التصنيف) لجعل الاسم أنظف
       const cleanDesc = description.replace(/\s*\([^)]*\)/g, '');
       productsList += `${index + 1}. ${cleanDesc} - ${item.price} درهم\n`;
       productsList += `   🔗 الرابط: ${window.location.origin}/product/${item.id}\n`;
     });
 
     const message = 
-`🛍️ *MAMATI طلب شراء من متجر🛍️
+`🛍️ #MAMATI طلب شراء من متجر 🛍️
 ${productsList}
 ━━━━━━━━━━━━━━━━━━━━
 💰 *المجموع الكلي:* ${totalPrice} درهم
-📋 *رقم الطلب:* #${orderNumberFormatted}
-✨ شكراً لتسوقك من مامتي!`;
+📋 *رقم الطلب:* ${orderNumberFormatted}`;
 
     return encodeURIComponent(message);
   };
