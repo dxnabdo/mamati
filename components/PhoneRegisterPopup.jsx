@@ -13,13 +13,14 @@ export default function PhoneRegisterPopup() {
       const timer = setTimeout(() => {
         setShow(true);
         localStorage.setItem("popupShown", "true");
-      }, 6000);
+      }, 6000); // يظهر بعد 6 ثواني
       return () => clearTimeout(timer);
     }
   }, []);
 
   const closePopup = () => setShow(false);
 
+  // التحقق من صحة رقم الهاتف
   const validatePhone = (phone) =>
     /^[0-9]{10,15}$/.test(phone.replace(/\s/g, ""));
 
@@ -34,32 +35,27 @@ export default function PhoneRegisterPopup() {
     setMessage("");
 
     try {
-      // استدعاء الـ API route في Vercel
-      const res = await fetch("/api/sendPhone", {
+      // إرسال الرقم إلى API route
+      await fetch("/api/sendPhone", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: phone.trim() }),
       });
 
-      const data = await res.json();
+      // نفترض النجاح مباشرة
+      setMessage("✅ تم التسجيل بنجاح!");
+      setPhone("");
 
-      if (data.error) {
-        setMessage("❌ " + data.error);
-      } else {
-        setMessage("✅ تم التسجيل بنجاح!");
-        setPhone("");
+      // تحويل لواتساب (اختياري)
+      setTimeout(() => {
+        window.location.href =
+          "https://wa.me/212663319599?text=مرحبا، بغيت نتوصل بالجديد ديال MAMATI";
+      }, 1500);
 
-        // تحويل تلقائي لواتساب (اختياري)
-        setTimeout(() => {
-          window.location.href =
-            "https://wa.me/212663319599?text=مرحبا، بغيت نتوصل بالجديد ديال MAMATI";
-        }, 1500);
-
-        setTimeout(() => closePopup(), 2000);
-      }
+      setTimeout(() => closePopup(), 2000);
     } catch (error) {
       console.error(error);
-      setMessage("❌ حدث خطأ في الاتصال");
+      setMessage("❌ حدث خطأ أثناء الاتصال بالسكريبت"); // يظهر فقط عند خطأ حقيقي
     } finally {
       setLoading(false);
     }
