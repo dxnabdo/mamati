@@ -7,12 +7,13 @@ export default function PhoneRegisterPopup() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ⚠️ ضع هنا رابط Web App الخاص بك الذي حصلت عليه من Google Apps Script
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRZ6QoaUBoT9ZkGtFVE4e4aWqgtVNrUPgW-8njaOU0uaC4-sJYYAsE4tJBTUdips2U/exec";
+
   useEffect(() => {
     const hasShown = localStorage.getItem("popupShown");
-    console.log("hasShown:", hasShown); // للتأكد
     if (!hasShown) {
       const timer = setTimeout(() => {
-        console.log("⏰ 6 seconds passed, showing popup");
         setShow(true);
         localStorage.setItem("popupShown", "true");
       }, 6000);
@@ -30,21 +31,29 @@ export default function PhoneRegisterPopup() {
     setLoading(true);
     setMessage("");
     try {
-      const payload = [{ Phone: phone.trim(), Date: new Date().toLocaleString("ar-EG"), Source: "Website Popup" }];
-      const res = await fetch("https://api.sheetbest.com/sheets/55a38627-8b83-4a28-afa2-e43ea9fec380", {
+      const payload = {
+        date: new Date().toLocaleString("ar-EG"),
+        phone: phone.trim(),
+        id: Date.now().toString() // معرف فريد (يمكنك تعديله)
+      };
+      
+      const res = await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (res.ok) {
+      
+      const result = await res.json();
+      if (result.success) {
         setMessage("✅ تم التسجيل بنجاح!");
         setPhone("");
         setTimeout(() => closePopup(), 2000);
       } else {
-        setMessage("❌ فشل الإرسال");
+        setMessage("❌ فشل الإرسال: " + (result.error || ""));
       }
     } catch (error) {
-      setMessage("❌ حدث خطأ");
+      console.error(error);
+      setMessage("❌ حدث خطأ في الاتصال");
     } finally {
       setLoading(false);
     }
