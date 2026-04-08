@@ -22,7 +22,7 @@ export default function CartPage() {
     playSound('success');
     const message = createWhatsAppMessage(items, getTotalPrice());
     window.open(`https://wa.me/212663319599?text=${message}`, '_blank');
-    clearCart();
+    clearCart(); // تفريغ السلة بعد فتح واتساب
     setIsCheckingOut(false);
     showToast('order_sent', 'success');
   };
@@ -71,23 +71,33 @@ export default function CartPage() {
     let lastOrder = localStorage.getItem('lastOrderNumber');
     let orderNumber = lastOrder ? parseInt(lastOrder) + 1 : 1;
     localStorage.setItem('lastOrderNumber', orderNumber);
-    // الرقم بصيغة MAMATI1-0001 (بدون هاشتاج)
-    const orderNumberFormatted = `MAMATI1-${String(orderNumber).padStart(4, '0')}`;
+    const orderNumberFormatted = `#MAMATI-${String(orderNumber).padStart(4, '0')}`;
 
     let productsList = '';
     items.forEach((item, index) => {
       const description = getProductDescription(item);
-      const cleanDesc = description.replace(/\s*\([^)]*\)/g, '');
-      productsList += `${index + 1}. ${cleanDesc} - ${item.price} درهم\n`;
-      productsList += `   🔗 الرابط: ${window.location.origin}/product/${item.id}\n`;
+      // إزالة التصنيف بين قوسين (مع الحفاظ على الأيقونة)
+      const cleanDesc = description.replace(/\s*\([^)]*\)/g, '').trim();
+      // رابط مختصر (بدون https://)
+      const shortUrl = `${window.location.origin}/product/${item.id}`.replace(/^https?:\/\//, '');
+
+      productsList += `🛍️ المنتج: ${cleanDesc}\n`;
+      productsList += `💰 السعر: ${item.price} درهم\n`;
+      productsList += `🔗 رابط المنتج: ${shortUrl}\n\n`;
     });
 
     const message = 
-`🛍️ #MAMATI طلب شراء من متجر 🛍️
+`🌟🛒 طلبك من متجر MAMATI جاهز ! 🛒🌟
+
 ${productsList}
 ━━━━━━━━━━━━━━━━━━━━
-💰 *المجموع الكلي:* ${totalPrice} درهم
-📋 *رقم الطلب:* ${orderNumberFormatted}`;
+💳 *المجموع الكلي:* ${totalPrice} درهم
+🆔 *رقم الطلب:* ${orderNumberFormatted}
+
+✨ شكرًا لك!
+📞 سيتم التواصل معك قريبًا لتأكيد الطلب وأخذ عنوانك.
+
+🎁 استمتع بتجربتك معنا في MAMATI!`;
 
     return encodeURIComponent(message);
   };
